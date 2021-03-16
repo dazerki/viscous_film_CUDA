@@ -6,6 +6,7 @@ set(CMAKE_DEPENDS_LANGUAGES
 # The set of files for implicit dependencies of each language:
 set(CMAKE_DEPENDS_CHECK_C
   "/home/antoine/Documents/Viscous/GPU/src/shaders.c" "/home/antoine/Documents/Viscous/GPU/build/CMakeFiles/project.dir/src/shaders.c.o"
+  "/home/antoine/Documents/Viscous/GPU/src/viscous.c" "/home/antoine/Documents/Viscous/GPU/build/CMakeFiles/project.dir/src/viscous.c.o"
   "/home/antoine/Documents/Viscous/GPU/src/window.c" "/home/antoine/Documents/Viscous/GPU/build/CMakeFiles/project.dir/src/window.c.o"
   )
 set(CMAKE_C_COMPILER_ID "GNU")
@@ -19,7 +20,6 @@ set(CMAKE_C_TARGET_INCLUDE_PATH
 set(CMAKE_DEPENDS_CHECK_CUDA
   "/home/antoine/Documents/Viscous/GPU/src/kernel.cu" "/home/antoine/Documents/Viscous/GPU/build/CMakeFiles/project.dir/src/kernel.cu.o"
   "/home/antoine/Documents/Viscous/GPU/src/project.cu" "/home/antoine/Documents/Viscous/GPU/build/CMakeFiles/project.dir/src/project.cu.o"
-  "/home/antoine/Documents/Viscous/GPU/src/viscous.cu" "/home/antoine/Documents/Viscous/GPU/build/CMakeFiles/project.dir/src/viscous.cu.o"
   )
 set(CMAKE_CUDA_COMPILER_ID "NVIDIA")
 

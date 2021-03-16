@@ -29,7 +29,7 @@ __global__ void flux_x(float *u, float *data_3D, float *data_edge, int di, int d
 
 	  float tau = 0.001f ;
 		float e = 0.01f;
-		float eta = 0.005f;
+		float eta = 0.001f;
 		float G = 5.0f;
 		float beta = 0.0f;
 		if (i==0){
@@ -147,7 +147,7 @@ __global__ void flux_y(float *u, float *data_3D, float *data_edge, int di, int d
 
 	  float tau = 0.001f ;
 		float e = 0.01f;
-		float eta = 0.005f;
+		float eta = 0.001f;
 		float G = 5.0f;
 		float beta = 0.0f;
 		if (j==0){

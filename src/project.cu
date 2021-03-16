@@ -1,7 +1,10 @@
 
-#include "window.h"
-#include "shaders.h"
-#include "viscous.h"
+extern "C" {
+  #include "window.h"
+  #include "shaders.h"
+  #include "viscous.h"
+}
+
 #include "kernel.h"
 
 #define GLEW_STATIC
@@ -13,7 +16,7 @@
 #include <math.h>
 #include <string.h>
 #include <omp.h>
-#include <time.h>
+#include <sys/time.h>
 #include <cuda.h>
 
 
@@ -44,7 +47,7 @@ int main(int argc, char *argv[]){
   int size_3D = 3*size;
 
 	// memory allocation
-	float* u = (float*)calloc(size, sizeof(float));
+	u = (float*)calloc(size, sizeof(float));
 	float* data_3D = (float*)calloc(size_3D, sizeof(float));
 	float* height_center = (float*)calloc(size, sizeof(float));
 	float* height_x_edge = (float*)calloc(size_x, sizeof(float));
@@ -154,10 +157,10 @@ int main(int argc, char *argv[]){
   glVertexAttribPointer(colAttrib, 1, GL_FLOAT, GL_FALSE, 0, (void*)0);
 
 	// PARAMETER
-	float tau = 0.001f ;
-	int n_passe = 100;
+	// float tau = 0.01f ;
+	int n_passe = 10;
 
-  // struct timeval start, end;
+  struct timeval start, end;
   // gettimeofday(&start, NULL);
 
 
@@ -171,7 +174,21 @@ int main(int argc, char *argv[]){
   		for(int rho=0; rho<4; rho++){
   			flux_y<<<Nblocks, Nthreads>>>(u_gpu, data_3D_gpu, data_edge_y_gpu, 0, 1, rho);
   		}
+
+      glfwPollEvents();
+  		if(drag){
+        cudaMemcpy( u, u_gpu, size*sizeof(float), cudaMemcpyDeviceToHost );
+  			add_fluid(window);
+        cudaMemcpy( u_gpu, u, memSize, cudaMemcpyHostToDevice );
+  		}
   	}
+    gettimeofday(&end, NULL);
+
+    double delta = ((end.tv_sec  - start.tv_sec) * 1000000u +
+           end.tv_usec - start.tv_usec) / 1.e6;
+    // printf("Time taken: %f \n", delta);
+
+    gettimeofday(&start, NULL);
 
   	cudaMemcpy( u, u_gpu, size*sizeof(float), cudaMemcpyDeviceToHost );
 

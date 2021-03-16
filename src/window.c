@@ -1,4 +1,5 @@
 #include "window.h"
+#include <math.h>
 
 
 /*
@@ -17,6 +18,7 @@ GLFWwindow *init_window() {
 
     // Callbacks
     glfwSetKeyCallback(window, key_callback);
+    glfwSetMouseButtonCallback(window, mouse_button_callback);
 
     // Init GLEW
     glewExperimental = GL_TRUE;
@@ -35,4 +37,26 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
     if (key == GLFW_KEY_SPACE && action == GLFW_PRESS) {
         printf("Spacebar pressed !\n");
     }
+}
+
+void mouse_button_callback(GLFWwindow* window, int button, int action, int mods)
+{
+		if(button == GLFW_MOUSE_BUTTON_LEFT) {
+			drag = (action == GLFW_PRESS);
+		}
+
+}
+
+void add_fluid(GLFWwindow* window){
+	double xpos, ypos;
+	glfwGetCursorPos(window, &xpos, &ypos);
+	int i = 512-floor(512*xpos/800);
+	int j = floor(512*ypos/800);
+	for(int k=-20; k<20; k++){
+		for(int p=-20; p<20 ; p++){
+			if((k*k)+(p*p)<400){
+				u[512*(j+p)+(i+k)] = u[512*(j+p)+(i+k)] + 0.002f;
+			}
+		}
+	}
 }
