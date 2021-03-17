@@ -7,6 +7,8 @@ project(Project LANGUAGES C CUDA)
 set(EXEC_NAME project)
 set(CMAKE_C_FLAGS "-O3")
 
+
+
 # CMake module
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/")
 
@@ -34,11 +36,13 @@ include_directories(${OPENGL_INCLUDE_DIR})
 # Project files
 include_directories(${PROJECT_SOURCE_DIR}/src ${PROJECT_SOURCE_DIR}/inc)
 file(GLOB C_SRCS
-    "${PROJECT_SOURCE_DIR}/src/*.c"
+    "${PROJECT_SOURCE_DIR}/src_simple/*.c"
 )
 file(GLOB CUDA_SRCS
-    "${PROJECT_SOURCE_DIR}/src/*.cu"
+    "${PROJECT_SOURCE_DIR}/src_simple/*.cu"
 )
 # Use Gcc for compiling/linking the source files
 add_executable(${EXEC_NAME} ${C_SRCS} ${CUDA_SRCS})
 target_link_libraries(${EXEC_NAME} ${PYTHON_LIBRARIES} ${OPENMP_C_LIBRARIES} ${GLEW_LIBRARIES} ${GLFW3_LIBRARY} ${OPENGL_LIBRARY} pthread m)
+
+set_property(TARGET ${EXEC_NAME} PROPERTY CUDA_ARCHITECTURES 70-real 72-virtual)

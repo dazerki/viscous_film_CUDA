@@ -6,13 +6,9 @@
 
 #IncludeRegexTransform: 
 
-../inc/kernel.h
-
 ../inc/shaders.h
 GL/glew.h
 -
-
-../inc/viscous.h
 
 ../inc/window.h
 GL/glew.h
@@ -22,15 +18,17 @@ GLFW/glfw3.h
 stdio.h
 -
 
-/home/antoine/Documents/Viscous/GPU/src/project.cu
+/home/antoine/Documents/Viscous/GPU/src_simple/kernel.h
+
+/home/antoine/Documents/Viscous/GPU/src_simple/project.cu
 window.h
-/home/antoine/Documents/Viscous/GPU/src/window.h
+/home/antoine/Documents/Viscous/GPU/src_simple/window.h
 shaders.h
-/home/antoine/Documents/Viscous/GPU/src/shaders.h
+/home/antoine/Documents/Viscous/GPU/src_simple/shaders.h
 viscous.h
-/home/antoine/Documents/Viscous/GPU/src/viscous.h
+/home/antoine/Documents/Viscous/GPU/src_simple/viscous.h
 kernel.h
-/home/antoine/Documents/Viscous/GPU/src/kernel.h
+/home/antoine/Documents/Viscous/GPU/src_simple/kernel.h
 GL/glew.h
 -
 GLFW/glfw3.h
@@ -49,4 +47,6 @@ sys/time.h
 -
 cuda.h
 -
+
+/home/antoine/Documents/Viscous/GPU/src_simple/viscous.h
 

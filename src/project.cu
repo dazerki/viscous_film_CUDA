@@ -38,8 +38,8 @@ inline void gpuAssert(cudaError_t code, const char *file, int line, bool abort=t
 
 int main(int argc, char *argv[]){
 
-	int nx = 512;
-	int ny = 512;
+	int nx = 1200;
+	int ny = 1200;
 	float h = 1.0f/nx ;
 	int size = nx*ny;
 	int size_x = (nx+1)*(ny);
@@ -81,8 +81,9 @@ int main(int argc, char *argv[]){
 	cudaMemcpy( data_edge_x_gpu, data_edge_x, 2*size_x*sizeof(float), cudaMemcpyHostToDevice );
 	cudaMemcpy( data_edge_y_gpu, data_edge_y, 2*size_y*sizeof(float), cudaMemcpyHostToDevice );
 
-  int Nblocks = (nx*nx + 255)/256;
-  int Nthreads = 256;
+  int Nblocks = (nx*nx)/512;
+  int Nthreads = 512;
+
 
   // Initialise window
   GLFWwindow *window = init_window();
@@ -99,7 +100,8 @@ int main(int argc, char *argv[]){
   GLuint vbo_pos;
   glGenBuffers(1, &vbo_pos);
 
-	GLfloat positions[2*nx*nx];
+  GLfloat *positions = (GLfloat*) malloc(2*nx*nx*sizeof(GLfloat));
+
   for (int i = 0; i < nx; i++) {
       for (int j = 0; j < nx; j++) {
           int ind = j*nx+i;
@@ -109,8 +111,8 @@ int main(int argc, char *argv[]){
   }
 
   glBindBuffer(GL_ARRAY_BUFFER, vbo_pos);
-  glBufferData(GL_ARRAY_BUFFER, sizeof(positions), positions, GL_STATIC_DRAW);
-
+  glBufferData(GL_ARRAY_BUFFER, 2*nx*nx*sizeof(GLfloat), positions, GL_STATIC_DRAW);
+  printf("HERE \n" );
   // Specify vbo_pos' layout
   GLint posAttrib = glGetAttribLocation(shaderProgram, "position");
   glEnableVertexAttribArray(posAttrib);
@@ -120,7 +122,7 @@ int main(int argc, char *argv[]){
   GLuint ebo;
   glGenBuffers(1, &ebo);
 
-	GLuint elements[4*(nx-1)*(nx-1)];
+  GLuint *elements = (GLuint*) malloc(4*(nx-1)*(nx-1)*sizeof(GLuint));
     for (int i = 0; i < nx-1; i++) {
         for (int j = 0; j < nx-1; j++) {
             int ind  = i*nx+j;
@@ -134,13 +136,13 @@ int main(int argc, char *argv[]){
     }
 
   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
-  glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(elements), elements, GL_STATIC_DRAW);
+  glBufferData(GL_ELEMENT_ARRAY_BUFFER, 4*(nx-1)*(nx-1)*sizeof(GLuint), elements, GL_STATIC_DRAW);
 
 	// Create a Vertex Buffer Object for colors
   GLuint vbo_colors;
   glGenBuffers(1, &vbo_colors);
 
-  GLfloat colors[nx*nx];
+  GLfloat *colors = (GLfloat*) malloc(nx*nx*sizeof(GLfloat));
   for (int i = 0; i < nx; i++) {
       for (int j = 0; j < nx; j++) {
           int ind = i*nx+j;
@@ -149,7 +151,7 @@ int main(int argc, char *argv[]){
   }
 
   glBindBuffer(GL_ARRAY_BUFFER, vbo_colors);
-  glBufferData(GL_ARRAY_BUFFER, sizeof(colors), colors, GL_STREAM_DRAW);
+  glBufferData(GL_ARRAY_BUFFER, nx*nx*sizeof(GLfloat), colors, GL_STREAM_DRAW);
 
   // Specify vbo_color's layout
   GLint colAttrib = glGetAttribLocation(shaderProgram, "color");
@@ -158,7 +160,7 @@ int main(int argc, char *argv[]){
 
 	// PARAMETER
 	// float tau = 0.01f ;
-	int n_passe = 10;
+	int n_passe = 40;
 
   struct timeval start, end;
   // gettimeofday(&start, NULL);
@@ -166,27 +168,26 @@ int main(int argc, char *argv[]){
 
 	//LOOP IN TIME
   while(!glfwWindowShouldClose(window)) {
+
   	for(int p=0; p<n_passe; p++){
-  		for(int rho=0; rho<4; rho++){
-  			flux_x<<<Nblocks, Nthreads>>>(u_gpu, data_3D_gpu, data_edge_x_gpu, 1, 0, rho);
-  		}
 
-  		for(int rho=0; rho<4; rho++){
-  			flux_y<<<Nblocks, Nthreads>>>(u_gpu, data_3D_gpu, data_edge_y_gpu, 0, 1, rho);
-  		}
+  		flux_block<<<Nblocks, Nthreads>>>(u_gpu, data_3D_gpu, data_edge_x_gpu, f_gpu);
 
-      glfwPollEvents();
-  		if(drag){
-        cudaMemcpy( u, u_gpu, size*sizeof(float), cudaMemcpyDeviceToHost );
-  			add_fluid(window);
-        cudaMemcpy( u_gpu, u, memSize, cudaMemcpyHostToDevice );
-  		}
+      add_flux<<<Nblocks, Nthreads>>>(u_gpu, f_gpu);
+
+      // glfwPollEvents();
+  		// if(drag){
+      //   cudaMemcpy( u, u_gpu, size*sizeof(float), cudaMemcpyDeviceToHost );
+  		// 	add_fluid(window);
+      //   cudaMemcpy( u_gpu, u, memSize, cudaMemcpyHostToDevice );
+  		// }
   	}
+
     gettimeofday(&end, NULL);
 
     double delta = ((end.tv_sec  - start.tv_sec) * 1000000u +
            end.tv_usec - start.tv_usec) / 1.e6;
-    // printf("Time taken: %f \n", delta);
+    //printf("Time taken: %f \n", delta);
 
     gettimeofday(&start, NULL);
 
@@ -204,7 +205,7 @@ int main(int argc, char *argv[]){
   	}
 
   	glBindBuffer(GL_ARRAY_BUFFER, vbo_colors);
-  	glBufferData(GL_ARRAY_BUFFER, sizeof(colors), colors, GL_STREAM_DRAW);
+  	glBufferData(GL_ARRAY_BUFFER, nx*nx*sizeof(GLfloat), colors, GL_STREAM_DRAW);
 
 
   	// Draw elements
@@ -212,7 +213,6 @@ int main(int argc, char *argv[]){
 
   	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
   			glfwSetWindowShouldClose(window, GL_TRUE);
-
   }
 
   // gettimeofday(&end, NULL);
