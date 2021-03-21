@@ -58,10 +58,10 @@ cmake_force:
 SHELL = /bin/sh
 
 # The CMake executable.
-CMAKE_COMMAND = /snap/cmake/805/bin/cmake
+CMAKE_COMMAND = /snap/cmake/834/bin/cmake
 
 # The command to remove a file.
-RM = /snap/cmake/805/bin/cmake -E rm -f
+RM = /snap/cmake/834/bin/cmake -E rm -f
 
 # Escaping for special characters.
 EQUALS = =
@@ -78,7 +78,7 @@ CMAKE_BINARY_DIR = /home/antoine/Documents/Viscous/GPU/build
 # Special rule for the target rebuild_cache
 rebuild_cache:
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Running CMake to regenerate build system..."
-	/snap/cmake/805/bin/cmake --regenerate-during-build -S$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR)
+	/snap/cmake/834/bin/cmake --regenerate-during-build -S$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR)
 .PHONY : rebuild_cache
 
 # Special rule for the target rebuild_cache
@@ -142,140 +142,140 @@ project/fast:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/project.dir/build.make CMakeFiles/project.dir/build
 .PHONY : project/fast
 
-src_simple/kernel.o: src_simple/kernel.cu.o
+src/kernel.o: src/kernel.cu.o
 
-.PHONY : src_simple/kernel.o
-
-# target to build an object file
-src_simple/kernel.cu.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/project.dir/build.make CMakeFiles/project.dir/src_simple/kernel.cu.o
-.PHONY : src_simple/kernel.cu.o
-
-src_simple/kernel.i: src_simple/kernel.cu.i
-
-.PHONY : src_simple/kernel.i
-
-# target to preprocess a source file
-src_simple/kernel.cu.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/project.dir/build.make CMakeFiles/project.dir/src_simple/kernel.cu.i
-.PHONY : src_simple/kernel.cu.i
-
-src_simple/kernel.s: src_simple/kernel.cu.s
-
-.PHONY : src_simple/kernel.s
-
-# target to generate assembly for a file
-src_simple/kernel.cu.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/project.dir/build.make CMakeFiles/project.dir/src_simple/kernel.cu.s
-.PHONY : src_simple/kernel.cu.s
-
-src_simple/project.o: src_simple/project.cu.o
-
-.PHONY : src_simple/project.o
+.PHONY : src/kernel.o
 
 # target to build an object file
-src_simple/project.cu.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/project.dir/build.make CMakeFiles/project.dir/src_simple/project.cu.o
-.PHONY : src_simple/project.cu.o
+src/kernel.cu.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/project.dir/build.make CMakeFiles/project.dir/src/kernel.cu.o
+.PHONY : src/kernel.cu.o
 
-src_simple/project.i: src_simple/project.cu.i
+src/kernel.i: src/kernel.cu.i
 
-.PHONY : src_simple/project.i
+.PHONY : src/kernel.i
 
 # target to preprocess a source file
-src_simple/project.cu.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/project.dir/build.make CMakeFiles/project.dir/src_simple/project.cu.i
-.PHONY : src_simple/project.cu.i
+src/kernel.cu.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/project.dir/build.make CMakeFiles/project.dir/src/kernel.cu.i
+.PHONY : src/kernel.cu.i
 
-src_simple/project.s: src_simple/project.cu.s
+src/kernel.s: src/kernel.cu.s
 
-.PHONY : src_simple/project.s
+.PHONY : src/kernel.s
 
 # target to generate assembly for a file
-src_simple/project.cu.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/project.dir/build.make CMakeFiles/project.dir/src_simple/project.cu.s
-.PHONY : src_simple/project.cu.s
+src/kernel.cu.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/project.dir/build.make CMakeFiles/project.dir/src/kernel.cu.s
+.PHONY : src/kernel.cu.s
 
-src_simple/shaders.o: src_simple/shaders.c.o
+src/project.o: src/project.cu.o
 
-.PHONY : src_simple/shaders.o
+.PHONY : src/project.o
 
 # target to build an object file
-src_simple/shaders.c.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/project.dir/build.make CMakeFiles/project.dir/src_simple/shaders.c.o
-.PHONY : src_simple/shaders.c.o
+src/project.cu.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/project.dir/build.make CMakeFiles/project.dir/src/project.cu.o
+.PHONY : src/project.cu.o
 
-src_simple/shaders.i: src_simple/shaders.c.i
+src/project.i: src/project.cu.i
 
-.PHONY : src_simple/shaders.i
+.PHONY : src/project.i
 
 # target to preprocess a source file
-src_simple/shaders.c.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/project.dir/build.make CMakeFiles/project.dir/src_simple/shaders.c.i
-.PHONY : src_simple/shaders.c.i
+src/project.cu.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/project.dir/build.make CMakeFiles/project.dir/src/project.cu.i
+.PHONY : src/project.cu.i
 
-src_simple/shaders.s: src_simple/shaders.c.s
+src/project.s: src/project.cu.s
 
-.PHONY : src_simple/shaders.s
+.PHONY : src/project.s
 
 # target to generate assembly for a file
-src_simple/shaders.c.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/project.dir/build.make CMakeFiles/project.dir/src_simple/shaders.c.s
-.PHONY : src_simple/shaders.c.s
+src/project.cu.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/project.dir/build.make CMakeFiles/project.dir/src/project.cu.s
+.PHONY : src/project.cu.s
 
-src_simple/viscous.o: src_simple/viscous.c.o
+src/shaders.o: src/shaders.c.o
 
-.PHONY : src_simple/viscous.o
+.PHONY : src/shaders.o
 
 # target to build an object file
-src_simple/viscous.c.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/project.dir/build.make CMakeFiles/project.dir/src_simple/viscous.c.o
-.PHONY : src_simple/viscous.c.o
+src/shaders.c.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/project.dir/build.make CMakeFiles/project.dir/src/shaders.c.o
+.PHONY : src/shaders.c.o
 
-src_simple/viscous.i: src_simple/viscous.c.i
+src/shaders.i: src/shaders.c.i
 
-.PHONY : src_simple/viscous.i
+.PHONY : src/shaders.i
 
 # target to preprocess a source file
-src_simple/viscous.c.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/project.dir/build.make CMakeFiles/project.dir/src_simple/viscous.c.i
-.PHONY : src_simple/viscous.c.i
+src/shaders.c.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/project.dir/build.make CMakeFiles/project.dir/src/shaders.c.i
+.PHONY : src/shaders.c.i
 
-src_simple/viscous.s: src_simple/viscous.c.s
+src/shaders.s: src/shaders.c.s
 
-.PHONY : src_simple/viscous.s
+.PHONY : src/shaders.s
 
 # target to generate assembly for a file
-src_simple/viscous.c.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/project.dir/build.make CMakeFiles/project.dir/src_simple/viscous.c.s
-.PHONY : src_simple/viscous.c.s
+src/shaders.c.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/project.dir/build.make CMakeFiles/project.dir/src/shaders.c.s
+.PHONY : src/shaders.c.s
 
-src_simple/window.o: src_simple/window.c.o
+src/viscous.o: src/viscous.c.o
 
-.PHONY : src_simple/window.o
+.PHONY : src/viscous.o
 
 # target to build an object file
-src_simple/window.c.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/project.dir/build.make CMakeFiles/project.dir/src_simple/window.c.o
-.PHONY : src_simple/window.c.o
+src/viscous.c.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/project.dir/build.make CMakeFiles/project.dir/src/viscous.c.o
+.PHONY : src/viscous.c.o
 
-src_simple/window.i: src_simple/window.c.i
+src/viscous.i: src/viscous.c.i
 
-.PHONY : src_simple/window.i
+.PHONY : src/viscous.i
 
 # target to preprocess a source file
-src_simple/window.c.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/project.dir/build.make CMakeFiles/project.dir/src_simple/window.c.i
-.PHONY : src_simple/window.c.i
+src/viscous.c.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/project.dir/build.make CMakeFiles/project.dir/src/viscous.c.i
+.PHONY : src/viscous.c.i
 
-src_simple/window.s: src_simple/window.c.s
+src/viscous.s: src/viscous.c.s
 
-.PHONY : src_simple/window.s
+.PHONY : src/viscous.s
 
 # target to generate assembly for a file
-src_simple/window.c.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/project.dir/build.make CMakeFiles/project.dir/src_simple/window.c.s
-.PHONY : src_simple/window.c.s
+src/viscous.c.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/project.dir/build.make CMakeFiles/project.dir/src/viscous.c.s
+.PHONY : src/viscous.c.s
+
+src/window.o: src/window.c.o
+
+.PHONY : src/window.o
+
+# target to build an object file
+src/window.c.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/project.dir/build.make CMakeFiles/project.dir/src/window.c.o
+.PHONY : src/window.c.o
+
+src/window.i: src/window.c.i
+
+.PHONY : src/window.i
+
+# target to preprocess a source file
+src/window.c.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/project.dir/build.make CMakeFiles/project.dir/src/window.c.i
+.PHONY : src/window.c.i
+
+src/window.s: src/window.c.s
+
+.PHONY : src/window.s
+
+# target to generate assembly for a file
+src/window.c.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/project.dir/build.make CMakeFiles/project.dir/src/window.c.s
+.PHONY : src/window.c.s
 
 # Help Target
 help:
@@ -286,21 +286,21 @@ help:
 	@echo "... edit_cache"
 	@echo "... rebuild_cache"
 	@echo "... project"
-	@echo "... src_simple/kernel.o"
-	@echo "... src_simple/kernel.i"
-	@echo "... src_simple/kernel.s"
-	@echo "... src_simple/project.o"
-	@echo "... src_simple/project.i"
-	@echo "... src_simple/project.s"
-	@echo "... src_simple/shaders.o"
-	@echo "... src_simple/shaders.i"
-	@echo "... src_simple/shaders.s"
-	@echo "... src_simple/viscous.o"
-	@echo "... src_simple/viscous.i"
-	@echo "... src_simple/viscous.s"
-	@echo "... src_simple/window.o"
-	@echo "... src_simple/window.i"
-	@echo "... src_simple/window.s"
+	@echo "... src/kernel.o"
+	@echo "... src/kernel.i"
+	@echo "... src/kernel.s"
+	@echo "... src/project.o"
+	@echo "... src/project.i"
+	@echo "... src/project.s"
+	@echo "... src/shaders.o"
+	@echo "... src/shaders.i"
+	@echo "... src/shaders.s"
+	@echo "... src/viscous.o"
+	@echo "... src/viscous.i"
+	@echo "... src/viscous.s"
+	@echo "... src/window.o"
+	@echo "... src/window.i"
+	@echo "... src/window.s"
 .PHONY : help
 
 

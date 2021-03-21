@@ -38,8 +38,8 @@ inline void gpuAssert(cudaError_t code, const char *file, int line, bool abort=t
 
 int main(int argc, char *argv[]){
 
-	int nx = 1200;
-	int ny = 1200;
+	int nx = 512;
+	int ny = 512;
 	float h = 1.0f/nx ;
 	int size = nx*ny;
 	int size_x = (nx+1)*(ny);
@@ -58,21 +58,26 @@ int main(int argc, char *argv[]){
 
 	char fileName[] = "../src/brick_fines.txt";
 
-	float *u_gpu, *data_3D_gpu, *data_edge_x_gpu, *data_edge_y_gpu;
+	float *u_gpu, *data_3D_gpu, *data_edge_x_gpu, *data_edge_y_gpu, *f_gpu;
 
   size_t memSize = size*sizeof(float);
   size_t memSize_3D = size_3D*sizeof(float);
 
 	cudaMalloc( (void**)&u_gpu, memSize );
+  cudaMalloc( (void**)&f_gpu, memSize );
 	cudaMalloc( (void**)&data_3D_gpu, memSize_3D );
 	cudaMalloc( (void**)&data_edge_x_gpu, 2*size_x*sizeof(float) );
 	cudaMalloc( (void**)&data_edge_y_gpu, 2*size_y*sizeof(float) );
+
+
+
 
 	//init
 	initialization(u, nx, ny, h, 3);
 	read_txt(height_center, height_x_edge, height_y_edge, fileName, nx);
 	init_surface_height_map(data_3D, height_center, nx, ny, h);
 	init_height_map_edge(data_edge_x, data_edge_y, height_x_edge, height_y_edge, nx, ny, h);
+  cudaMemset(f_gpu, 0.0f, memSize);
 
 
 
@@ -81,8 +86,26 @@ int main(int argc, char *argv[]){
 	cudaMemcpy( data_edge_x_gpu, data_edge_x, 2*size_x*sizeof(float), cudaMemcpyHostToDevice );
 	cudaMemcpy( data_edge_y_gpu, data_edge_y, 2*size_y*sizeof(float), cudaMemcpyHostToDevice );
 
-  int Nblocks = (nx*nx)/512;
-  int Nthreads = 512;
+  int Nblocks = ((nx/8)*(nx/8))/64;
+  int Nthreads = 64;
+  // dim3 Nblocks, Nthreads;
+  // Nblocks.x = nx/16;
+  // Nblocks.y = nx/16;
+  // Nblocks.z = 1;
+  // Nthreads.x = 16;
+  // Nthreads.y = 16;
+  // Nthreads.z = 1;
+
+  int Nblocks_tot = (nx*nx)/64;
+  int Nthreads_tot = 64;
+
+  // dim3 grid, threads;
+  // grid.x = nx/(8*8);
+  // grid.y = nx/(8*8);
+  // grid.z = 1;
+  // threads.x = 8;
+  // threads.y = 8;
+  // threads.z = 1;
 
 
   // Initialise window
@@ -171,9 +194,11 @@ int main(int argc, char *argv[]){
 
   	for(int p=0; p<n_passe; p++){
 
-  		flux_block<<<Nblocks, Nthreads>>>(u_gpu, data_3D_gpu, data_edge_x_gpu, f_gpu);
+  		flux_block<<<Nblocks, Nthreads>>>(u_gpu, data_3D_gpu, data_edge_x_gpu, f_gpu, nx);
 
-      add_flux<<<Nblocks, Nthreads>>>(u_gpu, f_gpu);
+      update_u<<<Nblocks_tot, Nthreads_tot>>>(u_gpu, f_gpu);
+
+      cudaMemset(f_gpu, 0.0f, memSize);
 
       // glfwPollEvents();
   		// if(drag){

@@ -53,10 +53,10 @@ cmake_force:
 SHELL = /bin/sh
 
 # The CMake executable.
-CMAKE_COMMAND = /snap/cmake/805/bin/cmake
+CMAKE_COMMAND = /snap/cmake/834/bin/cmake
 
 # The command to remove a file.
-RM = /snap/cmake/805/bin/cmake -E rm -f
+RM = /snap/cmake/834/bin/cmake -E rm -f
 
 # Escaping for special characters.
 EQUALS = =
@@ -76,87 +76,87 @@ include CMakeFiles/project.dir/progress.make
 # Include the compile flags for this target's objects.
 include CMakeFiles/project.dir/flags.make
 
-CMakeFiles/project.dir/src_simple/shaders.c.o: CMakeFiles/project.dir/flags.make
-CMakeFiles/project.dir/src_simple/shaders.c.o: ../src_simple/shaders.c
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/antoine/Documents/Viscous/GPU/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Building C object CMakeFiles/project.dir/src_simple/shaders.c.o"
-	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/project.dir/src_simple/shaders.c.o -c /home/antoine/Documents/Viscous/GPU/src_simple/shaders.c
+CMakeFiles/project.dir/src/shaders.c.o: CMakeFiles/project.dir/flags.make
+CMakeFiles/project.dir/src/shaders.c.o: ../src/shaders.c
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/antoine/Documents/Viscous/GPU/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Building C object CMakeFiles/project.dir/src/shaders.c.o"
+	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/project.dir/src/shaders.c.o -c /home/antoine/Documents/Viscous/GPU/src/shaders.c
 
-CMakeFiles/project.dir/src_simple/shaders.c.i: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing C source to CMakeFiles/project.dir/src_simple/shaders.c.i"
-	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E /home/antoine/Documents/Viscous/GPU/src_simple/shaders.c > CMakeFiles/project.dir/src_simple/shaders.c.i
+CMakeFiles/project.dir/src/shaders.c.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing C source to CMakeFiles/project.dir/src/shaders.c.i"
+	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E /home/antoine/Documents/Viscous/GPU/src/shaders.c > CMakeFiles/project.dir/src/shaders.c.i
 
-CMakeFiles/project.dir/src_simple/shaders.c.s: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling C source to assembly CMakeFiles/project.dir/src_simple/shaders.c.s"
-	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /home/antoine/Documents/Viscous/GPU/src_simple/shaders.c -o CMakeFiles/project.dir/src_simple/shaders.c.s
+CMakeFiles/project.dir/src/shaders.c.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling C source to assembly CMakeFiles/project.dir/src/shaders.c.s"
+	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /home/antoine/Documents/Viscous/GPU/src/shaders.c -o CMakeFiles/project.dir/src/shaders.c.s
 
-CMakeFiles/project.dir/src_simple/viscous.c.o: CMakeFiles/project.dir/flags.make
-CMakeFiles/project.dir/src_simple/viscous.c.o: ../src_simple/viscous.c
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/antoine/Documents/Viscous/GPU/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Building C object CMakeFiles/project.dir/src_simple/viscous.c.o"
-	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/project.dir/src_simple/viscous.c.o -c /home/antoine/Documents/Viscous/GPU/src_simple/viscous.c
+CMakeFiles/project.dir/src/viscous.c.o: CMakeFiles/project.dir/flags.make
+CMakeFiles/project.dir/src/viscous.c.o: ../src/viscous.c
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/antoine/Documents/Viscous/GPU/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Building C object CMakeFiles/project.dir/src/viscous.c.o"
+	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/project.dir/src/viscous.c.o -c /home/antoine/Documents/Viscous/GPU/src/viscous.c
 
-CMakeFiles/project.dir/src_simple/viscous.c.i: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing C source to CMakeFiles/project.dir/src_simple/viscous.c.i"
-	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E /home/antoine/Documents/Viscous/GPU/src_simple/viscous.c > CMakeFiles/project.dir/src_simple/viscous.c.i
+CMakeFiles/project.dir/src/viscous.c.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing C source to CMakeFiles/project.dir/src/viscous.c.i"
+	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E /home/antoine/Documents/Viscous/GPU/src/viscous.c > CMakeFiles/project.dir/src/viscous.c.i
 
-CMakeFiles/project.dir/src_simple/viscous.c.s: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling C source to assembly CMakeFiles/project.dir/src_simple/viscous.c.s"
-	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /home/antoine/Documents/Viscous/GPU/src_simple/viscous.c -o CMakeFiles/project.dir/src_simple/viscous.c.s
+CMakeFiles/project.dir/src/viscous.c.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling C source to assembly CMakeFiles/project.dir/src/viscous.c.s"
+	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /home/antoine/Documents/Viscous/GPU/src/viscous.c -o CMakeFiles/project.dir/src/viscous.c.s
 
-CMakeFiles/project.dir/src_simple/window.c.o: CMakeFiles/project.dir/flags.make
-CMakeFiles/project.dir/src_simple/window.c.o: ../src_simple/window.c
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/antoine/Documents/Viscous/GPU/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_3) "Building C object CMakeFiles/project.dir/src_simple/window.c.o"
-	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/project.dir/src_simple/window.c.o -c /home/antoine/Documents/Viscous/GPU/src_simple/window.c
+CMakeFiles/project.dir/src/window.c.o: CMakeFiles/project.dir/flags.make
+CMakeFiles/project.dir/src/window.c.o: ../src/window.c
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/antoine/Documents/Viscous/GPU/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_3) "Building C object CMakeFiles/project.dir/src/window.c.o"
+	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/project.dir/src/window.c.o -c /home/antoine/Documents/Viscous/GPU/src/window.c
 
-CMakeFiles/project.dir/src_simple/window.c.i: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing C source to CMakeFiles/project.dir/src_simple/window.c.i"
-	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E /home/antoine/Documents/Viscous/GPU/src_simple/window.c > CMakeFiles/project.dir/src_simple/window.c.i
+CMakeFiles/project.dir/src/window.c.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing C source to CMakeFiles/project.dir/src/window.c.i"
+	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E /home/antoine/Documents/Viscous/GPU/src/window.c > CMakeFiles/project.dir/src/window.c.i
 
-CMakeFiles/project.dir/src_simple/window.c.s: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling C source to assembly CMakeFiles/project.dir/src_simple/window.c.s"
-	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /home/antoine/Documents/Viscous/GPU/src_simple/window.c -o CMakeFiles/project.dir/src_simple/window.c.s
+CMakeFiles/project.dir/src/window.c.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling C source to assembly CMakeFiles/project.dir/src/window.c.s"
+	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /home/antoine/Documents/Viscous/GPU/src/window.c -o CMakeFiles/project.dir/src/window.c.s
 
-CMakeFiles/project.dir/src_simple/kernel.cu.o: CMakeFiles/project.dir/flags.make
-CMakeFiles/project.dir/src_simple/kernel.cu.o: ../src_simple/kernel.cu
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/antoine/Documents/Viscous/GPU/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_4) "Building CUDA object CMakeFiles/project.dir/src_simple/kernel.cu.o"
-	/usr/local/cuda/bin/nvcc -forward-unknown-to-host-compiler $(CUDA_DEFINES) $(CUDA_INCLUDES) $(CUDA_FLAGS) -x cu -c /home/antoine/Documents/Viscous/GPU/src_simple/kernel.cu -o CMakeFiles/project.dir/src_simple/kernel.cu.o
+CMakeFiles/project.dir/src/kernel.cu.o: CMakeFiles/project.dir/flags.make
+CMakeFiles/project.dir/src/kernel.cu.o: ../src/kernel.cu
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/antoine/Documents/Viscous/GPU/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_4) "Building CUDA object CMakeFiles/project.dir/src/kernel.cu.o"
+	/usr/local/cuda/bin/nvcc -forward-unknown-to-host-compiler $(CUDA_DEFINES) $(CUDA_INCLUDES) $(CUDA_FLAGS) -x cu -c /home/antoine/Documents/Viscous/GPU/src/kernel.cu -o CMakeFiles/project.dir/src/kernel.cu.o
 
-CMakeFiles/project.dir/src_simple/kernel.cu.i: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CUDA source to CMakeFiles/project.dir/src_simple/kernel.cu.i"
+CMakeFiles/project.dir/src/kernel.cu.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CUDA source to CMakeFiles/project.dir/src/kernel.cu.i"
 	$(CMAKE_COMMAND) -E cmake_unimplemented_variable CMAKE_CUDA_CREATE_PREPROCESSED_SOURCE
 
-CMakeFiles/project.dir/src_simple/kernel.cu.s: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CUDA source to assembly CMakeFiles/project.dir/src_simple/kernel.cu.s"
+CMakeFiles/project.dir/src/kernel.cu.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CUDA source to assembly CMakeFiles/project.dir/src/kernel.cu.s"
 	$(CMAKE_COMMAND) -E cmake_unimplemented_variable CMAKE_CUDA_CREATE_ASSEMBLY_SOURCE
 
-CMakeFiles/project.dir/src_simple/project.cu.o: CMakeFiles/project.dir/flags.make
-CMakeFiles/project.dir/src_simple/project.cu.o: ../src_simple/project.cu
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/antoine/Documents/Viscous/GPU/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_5) "Building CUDA object CMakeFiles/project.dir/src_simple/project.cu.o"
-	/usr/local/cuda/bin/nvcc -forward-unknown-to-host-compiler $(CUDA_DEFINES) $(CUDA_INCLUDES) $(CUDA_FLAGS) -x cu -c /home/antoine/Documents/Viscous/GPU/src_simple/project.cu -o CMakeFiles/project.dir/src_simple/project.cu.o
+CMakeFiles/project.dir/src/project.cu.o: CMakeFiles/project.dir/flags.make
+CMakeFiles/project.dir/src/project.cu.o: ../src/project.cu
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/antoine/Documents/Viscous/GPU/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_5) "Building CUDA object CMakeFiles/project.dir/src/project.cu.o"
+	/usr/local/cuda/bin/nvcc -forward-unknown-to-host-compiler $(CUDA_DEFINES) $(CUDA_INCLUDES) $(CUDA_FLAGS) -x cu -c /home/antoine/Documents/Viscous/GPU/src/project.cu -o CMakeFiles/project.dir/src/project.cu.o
 
-CMakeFiles/project.dir/src_simple/project.cu.i: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CUDA source to CMakeFiles/project.dir/src_simple/project.cu.i"
+CMakeFiles/project.dir/src/project.cu.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CUDA source to CMakeFiles/project.dir/src/project.cu.i"
 	$(CMAKE_COMMAND) -E cmake_unimplemented_variable CMAKE_CUDA_CREATE_PREPROCESSED_SOURCE
 
-CMakeFiles/project.dir/src_simple/project.cu.s: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CUDA source to assembly CMakeFiles/project.dir/src_simple/project.cu.s"
+CMakeFiles/project.dir/src/project.cu.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CUDA source to assembly CMakeFiles/project.dir/src/project.cu.s"
 	$(CMAKE_COMMAND) -E cmake_unimplemented_variable CMAKE_CUDA_CREATE_ASSEMBLY_SOURCE
 
 # Object files for target project
 project_OBJECTS = \
-"CMakeFiles/project.dir/src_simple/shaders.c.o" \
-"CMakeFiles/project.dir/src_simple/viscous.c.o" \
-"CMakeFiles/project.dir/src_simple/window.c.o" \
-"CMakeFiles/project.dir/src_simple/kernel.cu.o" \
-"CMakeFiles/project.dir/src_simple/project.cu.o"
+"CMakeFiles/project.dir/src/shaders.c.o" \
+"CMakeFiles/project.dir/src/viscous.c.o" \
+"CMakeFiles/project.dir/src/window.c.o" \
+"CMakeFiles/project.dir/src/kernel.cu.o" \
+"CMakeFiles/project.dir/src/project.cu.o"
 
 # External object files for target project
 project_EXTERNAL_OBJECTS =
 
-project: CMakeFiles/project.dir/src_simple/shaders.c.o
-project: CMakeFiles/project.dir/src_simple/viscous.c.o
-project: CMakeFiles/project.dir/src_simple/window.c.o
-project: CMakeFiles/project.dir/src_simple/kernel.cu.o
-project: CMakeFiles/project.dir/src_simple/project.cu.o
+project: CMakeFiles/project.dir/src/shaders.c.o
+project: CMakeFiles/project.dir/src/viscous.c.o
+project: CMakeFiles/project.dir/src/window.c.o
+project: CMakeFiles/project.dir/src/kernel.cu.o
+project: CMakeFiles/project.dir/src/project.cu.o
 project: CMakeFiles/project.dir/build.make
 project: /usr/lib/x86_64-linux-gnu/libpython3.8.so
 project: /usr/lib/x86_64-linux-gnu/libGLEW.so
