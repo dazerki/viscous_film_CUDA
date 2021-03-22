@@ -13,5 +13,5 @@ CUDA_DEFINES =
 
 CUDA_INCLUDES = -I/usr/include/python3.8 -I/home/antoine/Documents/Viscous/GPU/src -I/home/antoine/Documents/Viscous/GPU/inc
 
-CUDA_FLAGS = 
+CUDA_FLAGS = -lineinfo --generate-code=arch=compute_70,code=[sm_70] --generate-code=arch=compute_72,code=[compute_72]
 
