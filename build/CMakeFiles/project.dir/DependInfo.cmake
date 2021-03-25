@@ -1,33 +1,18 @@
+
+# Consider dependencies only in project.
+set(CMAKE_DEPENDS_IN_PROJECT_ONLY OFF)
+
 # The set of languages for which implicit dependencies are needed:
 set(CMAKE_DEPENDS_LANGUAGES
-  "C"
-  "CUDA"
   )
-# The set of files for implicit dependencies of each language:
-set(CMAKE_DEPENDS_CHECK_C
-  "/home/antoine/Documents/Viscous/GPU/src/shaders.c" "/home/antoine/Documents/Viscous/GPU/build/CMakeFiles/project.dir/src/shaders.c.o"
-  "/home/antoine/Documents/Viscous/GPU/src/viscous.c" "/home/antoine/Documents/Viscous/GPU/build/CMakeFiles/project.dir/src/viscous.c.o"
-  "/home/antoine/Documents/Viscous/GPU/src/window.c" "/home/antoine/Documents/Viscous/GPU/build/CMakeFiles/project.dir/src/window.c.o"
-  )
-set(CMAKE_C_COMPILER_ID "GNU")
 
-# The include file search paths:
-set(CMAKE_C_TARGET_INCLUDE_PATH
-  "/usr/include/python3.8"
-  "../src"
-  "../inc"
-  )
-set(CMAKE_DEPENDS_CHECK_CUDA
-  "/home/antoine/Documents/Viscous/GPU/src/kernel.cu" "/home/antoine/Documents/Viscous/GPU/build/CMakeFiles/project.dir/src/kernel.cu.o"
-  "/home/antoine/Documents/Viscous/GPU/src/project.cu" "/home/antoine/Documents/Viscous/GPU/build/CMakeFiles/project.dir/src/project.cu.o"
-  )
-set(CMAKE_CUDA_COMPILER_ID "NVIDIA")
-
-# The include file search paths:
-set(CMAKE_CUDA_TARGET_INCLUDE_PATH
-  "/usr/include/python3.8"
-  "../src"
-  "../inc"
+# The set of dependency files which are needed:
+set(CMAKE_DEPENDS_DEPENDENCY_FILES
+  "/home/antoine/Documents/Viscous/GPU/src/shaders.c" "CMakeFiles/project.dir/src/shaders.c.o" "gcc" "CMakeFiles/project.dir/src/shaders.c.o.d"
+  "/home/antoine/Documents/Viscous/GPU/src/viscous.c" "CMakeFiles/project.dir/src/viscous.c.o" "gcc" "CMakeFiles/project.dir/src/viscous.c.o.d"
+  "/home/antoine/Documents/Viscous/GPU/src/window.c" "CMakeFiles/project.dir/src/window.c.o" "gcc" "CMakeFiles/project.dir/src/window.c.o.d"
+  "/home/antoine/Documents/Viscous/GPU/src/kernel.cu" "CMakeFiles/project.dir/src/kernel.cu.o" "gcc" "CMakeFiles/project.dir/src/kernel.cu.o.d"
+  "/home/antoine/Documents/Viscous/GPU/src/project.cu" "CMakeFiles/project.dir/src/project.cu.o" "gcc" "CMakeFiles/project.dir/src/project.cu.o.d"
   )
 
 # Targets to which this target links.

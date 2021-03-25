@@ -22,6 +22,14 @@ GLFW/glfw3.h
 stdio.h
 -
 
+/home/antoine/Documents/Viscous/GPU/src/kernel.cu
+cuda.h
+-
+stdio.h
+-
+kernel.h
+/home/antoine/Documents/Viscous/GPU/src/kernel.h
+
 /home/antoine/Documents/Viscous/GPU/src/project.cu
 window.h
 /home/antoine/Documents/Viscous/GPU/src/window.h

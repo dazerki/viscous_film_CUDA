@@ -7,67 +7,65 @@
 __global__ void flux_block(float *u, float* data_3D_gpu, float* data_edge_gpu, float *flx, int nx){
 	//position in the grid
 	int k = (blockIdx.x * blockDim.x + threadIdx.x);
-	int pos_x = 8*(8*k/nx) - 2;
-	int pos_y = 8*(k%(nx/8)) - 2;
-
+	int pos_x = 2*(2*k/nx) - 2;
+	int pos_y = 2*(k%(nx/2)) - 2;
 
 	//access memory
-	float u_local[121];
-	float data_3D_local[363];
-	float data_edge_local[242];
+	float u_local[25];
+	float data_3D_local[75];
+	float data_edge_local[50];
 
-	if(pos_x == -1 || pos_x == -2 || pos_x == nx-10 || pos_y == -1 || pos_y == -2 || pos_y == nx-10){
+	if(pos_x == -1 || pos_x == -2 || pos_x == nx-4 || pos_y == -1 || pos_y == -2 || pos_y == nx-4){
 
 		//u local
-		for(int j=0; j<11; j++){
-			for(int i=0; i<11; i++){
-				u_local[11*j+i] = u[(pos_y+j+nx)%nx *nx + (pos_x+i+nx)%nx];
+		for(int j=0; j<5; j++){
+			for(int i=0; i<5; i++){
+				u_local[5*j+i] = u[(pos_y+j+nx)%nx *nx + (pos_x+i+nx)%nx];
 			}
 		}
 
 
 		//data_3D
-		for(int j=0; j<11; j++){
-			for(int i=0; i<11; i++){
-				data_3D_local[(11*j+i)*3] = data_3D_gpu[((pos_y+j+nx)%nx *nx + (pos_x+i+nx)%nx)*3];
-				data_3D_local[(11*j+i)*3 + 1] = data_3D_gpu[((pos_y+j+nx)%nx *nx + (pos_x+i+nx)%nx)*3 + 1];
-				data_3D_local[(11*j+i)*3 + 2] = data_3D_gpu[((pos_y+j+nx)%nx *nx + (pos_x+i+nx)%nx)*3 + 2];
+		for(int j=1; j<4; j++){
+			for(int i=1; i<4; i++){
+				data_3D_local[(5*j+i)*3] = data_3D_gpu[((pos_y+j+nx)%nx *nx + (pos_x+i+nx)%nx)*3];
+				data_3D_local[(5*j+i)*3 + 1] = data_3D_gpu[((pos_y+j+nx)%nx *nx + (pos_x+i+nx)%nx)*3 + 1];
+				data_3D_local[(5*j+i)*3 + 2] = data_3D_gpu[((pos_y+j+nx)%nx *nx + (pos_x+i+nx)%nx)*3 + 2];
 			}
 		}
 
 		//data_edge
-		for(int j=0; j<11; j++){
-			for(int i=0; i<11; i++){
-				data_edge_local[(11*j+i)*2] = data_edge_gpu[((pos_y+j+nx)%nx *nx + (pos_x+i+nx)%nx)*2];
-				data_edge_local[(11*j+i)*2 + 1] = data_edge_gpu[((pos_y+j+nx)%nx *nx + (pos_x+i+nx)%nx)*2 + 1];
+		for(int j=1; j<4; j++){
+			for(int i=1; i<4; i++){
+				data_edge_local[(5*j+i)*2] = data_edge_gpu[((pos_y+j+nx)%nx *nx + (pos_x+i+nx)%nx)*2];
+				data_edge_local[(5*j+i)*2 + 1] = data_edge_gpu[((pos_y+j+nx)%nx *nx + (pos_x+i+nx)%nx)*2 + 1];
 			}
 		}
 	} else {
 		//u local
-		for(int j=0; j<11; j++){
-			for(int i=0; i<11; i++){
-
-				u_local[11*j+i] = u[(pos_y+j)*nx + (pos_x+i)];
+		for(int j=0; j<5; j++){
+			for(int i=0; i<5; i++){
+				u_local[5*j+i] = u[(pos_y+j)*nx + (pos_x+i)];
 			}
 		}
 
 		//data_3D
-		for(int j=0; j<11; j++){
-			for(int i=0; i<11; i++){
-				if(((pos_y+j)*nx + (pos_x+i))*3 > 3*nx*nx){
-					printf("index = %d \n", ((pos_y+j)*nx + (pos_x+i))*3);
-				}
-				data_3D_local[(11*j+i)*3] = data_3D_gpu[((pos_y+j)*nx + (pos_x+i))*3];
-				data_3D_local[(11*j+i)*3 + 1] = data_3D_gpu[((pos_y+j)*nx + (pos_x+i))*3 + 1];
-				data_3D_local[(11*j+i)*3 + 2] = data_3D_gpu[((pos_y+j)*nx + (pos_x+i))*3 + 2];
+		for(int j=1; j<4; j++){
+			for(int i=1; i<4; i++){
+				// if(((pos_y+j)*nx + (pos_x+i))*3 > 3*nx*nx){
+				// 	printf("index = %d \n", ((pos_y+j)*nx + (pos_x+i))*3);
+				// }
+				data_3D_local[(5*j+i)*3] = data_3D_gpu[((pos_y+j)*nx + (pos_x+i))*3];
+				data_3D_local[(5*j+i)*3 + 1] = data_3D_gpu[((pos_y+j)*nx + (pos_x+i))*3 + 1];
+				data_3D_local[(5*j+i)*3 + 2] = data_3D_gpu[((pos_y+j)*nx + (pos_x+i))*3 + 2];
 			}
 		}
 
 		//data_edge
-		for(int j=0; j<11; j++){
-			for(int i=0; i<11; i++){
-				data_edge_local[(11*j+i)*2] = data_edge_gpu[((pos_y+j)*nx + (pos_x+i))*2];
-				data_edge_local[(11*j+i)*2 + 1] = data_edge_gpu[((pos_y+j)*nx + (pos_x+i))*2 + 1];
+		for(int j=1; j<4; j++){
+			for(int i=1; i<4; i++){
+				data_edge_local[(5*j+i)*2] = data_edge_gpu[((pos_y+j)*nx + (pos_x+i))*2];
+				data_edge_local[(5*j+i)*2 + 1] = data_edge_gpu[((pos_y+j)*nx + (pos_x+i))*2 + 1];
 			}
 		}
 	}
@@ -100,28 +98,28 @@ __global__ void flux_block(float *u, float* data_3D_gpu, float* data_edge_gpu, f
 			di = 0;
 			dj = 1;
 		}
-		for(int i=2; i<10; i++){
-			for(int j=2; j<10; j++){
+		for(int i=2; i<4; i++){
+			for(int j=2; j<4; j++){
 				i_p = i - di;
 				j_p = j - dj;
 
-				lap_q = (u_local[11*j + (i+1)] + u_local[11*(j+1) + i] + u_local[11*(j) + i-1]);
-				lap_p = (u_local[11*j_p + (i_p-1)] + u_local[11*(j_p) + i_p+1] + u_local[11*(j_p-1) + i_p]);
+				lap_q = (u_local[5*j + (i+1)] + u_local[5*(j+1) + i] + u_local[5*(j) + i-1]);
+				lap_p = (u_local[5*j_p + (i_p-1)] + u_local[5*(j_p) + i_p+1] + u_local[5*(j_p-1) + i_p]);
 
-				u_p = u_local[11*j_p + i_p];
-				u_q = u_local[11*j + i];
+				u_p = u_local[5*j_p + i_p];
+				u_q = u_local[5*j + i];
 
-				H_p = data_3D_local[(11*j_p + i_p)*3];
-				H_q = data_3D_local[(11*j + i)*3];
+				H_p = data_3D_local[(5*j_p + i_p)*3];
+				H_q = data_3D_local[(5*j + i)*3];
 
-				T_p = data_3D_local[(11*j_p + i_p)*3 + 1];
-				T_q = data_3D_local[(11*j + i)*3 + 1];
+				T_p = data_3D_local[(5*j_p + i_p)*3 + 1];
+				T_q = data_3D_local[(5*j + i)*3 + 1];
 
-				ct_p = data_3D_local[(11*j_p + i_p)*3 + 2];
-				ct_q = data_3D_local[(11*j + i)*3 + 2];
+				ct_p = data_3D_local[(5*j_p + i_p)*3 + 2];
+				ct_q = data_3D_local[(5*j + i)*3 + 2];
 
-				k_E = data_edge_local[(11*j + i)*2];
-				H_E = data_edge_local[(11*j + i)*2 + 1];
+				k_E = data_edge_local[(5*j + i)*2];
+				H_E = data_edge_local[(5*j + i)*2 + 1];
 
 				W_q = G*(nx-j-0.5f)*h - H_q;
 				W_p = G*(nx-j_p-0.5f)*h - H_p;
@@ -147,7 +145,7 @@ __global__ void flux_block(float *u, float* data_3D_gpu, float* data_edge_gpu, f
 					}
 				}
 
-				if(pos_x == -1 || pos_x == -2 || pos_x == nx-10 || pos_y == -1 || pos_y == -2 || pos_y == nx-10){
+				if(pos_x == -1 || pos_x == -2 || pos_x == nx-4 || pos_y == -1 || pos_y == -2 || pos_y == nx-4){
 					flx[(pos_y+j+nx)%nx *nx + (pos_x+i+nx)%nx] += delta_u;
 					flx[(pos_y+j_p+nx)%nx *nx + (pos_x+i_p+nx)%nx] -= delta_u;
 				} else {
@@ -165,4 +163,5 @@ __global__ void flux_block(float *u, float* data_3D_gpu, float* data_edge_gpu, f
 __global__ void update_u(float *u, float* flux){
 	int k = blockIdx.x * blockDim.x + threadIdx.x;
 	u[k] += flux[k];
+	flux[k] = 0.0f;
 }

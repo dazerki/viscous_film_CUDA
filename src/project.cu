@@ -38,8 +38,8 @@ inline void gpuAssert(cudaError_t code, const char *file, int line, bool abort=t
 
 int main(int argc, char *argv[]){
 
-	int nx = 2048;
-	int ny = 2048;
+	int nx = 512;
+	int ny = 512;
 	float h = 1.0f/nx ;
 	int size = nx*ny;
 	int size_x = (nx+1)*(ny);
@@ -86,8 +86,8 @@ int main(int argc, char *argv[]){
 	cudaMemcpy( data_edge_x_gpu, data_edge_x, 2*size_x*sizeof(float), cudaMemcpyHostToDevice );
 	cudaMemcpy( data_edge_y_gpu, data_edge_y, 2*size_y*sizeof(float), cudaMemcpyHostToDevice );
 
-  int Nblocks = ((nx/8)*(nx/8))/64;
-  int Nthreads = 64;
+  int Nblocks = ((nx/2)*(nx/2))/256;
+  int Nthreads = 256;
   // dim3 Nblocks, Nthreads;
   // Nblocks.x = nx/16;
   // Nblocks.y = nx/16;
@@ -96,8 +96,33 @@ int main(int argc, char *argv[]){
   // Nthreads.y = 16;
   // Nthreads.z = 1;
 
-  int Nblocks_tot = (nx*nx)/64;
-  int Nthreads_tot = 64;
+  int Nblocks_tot = (nx*nx)/512;
+  int Nthreads_tot = 512;
+
+  int num_bytes = 512*512*5*4;
+
+  cudaStream_t stream;
+  cudaStreamCreate(&stream);                                                                  // Create CUDA stream
+
+  cudaDeviceProp prop;                                                                        // CUDA device properties variable
+  cudaGetDeviceProperties( &prop, 0);                                                       // Query GPU properties
+  // size_t size_L2 = min( int(prop.l2CacheSize * 0.75) , prop.persistingL2CacheMaxSize );
+  // cudaDeviceSetLimit( cudaLimitPersistingL2CacheSize, size_L2);                                  // set-aside 3/4 of L2 cache for persisting accesses or the max allowed
+
+  size_t window_size = min(prop.accessPolicyMaxWindowSize, num_bytes);                        // Select minimum of user defined num_bytes and max window size.
+
+  cudaStreamAttrValue stream_attribute;                                                       // Stream level attributes data structure
+  stream_attribute.accessPolicyWindow.base_ptr  = reinterpret_cast<void*>(u_gpu);
+  stream_attribute.accessPolicyWindow.base_ptr  = reinterpret_cast<void*>(f_gpu);
+  stream_attribute.accessPolicyWindow.base_ptr  = reinterpret_cast<void*>(data_3D_gpu);           // Global Memory data pointer
+  stream_attribute.accessPolicyWindow.num_bytes = window_size;                                // Number of bytes for persistence access
+  stream_attribute.accessPolicyWindow.hitRatio  = 1.0;                                        // Hint for cache hit ratio
+  stream_attribute.accessPolicyWindow.hitProp   = cudaAccessPropertyPersisting;               // Persistence Property
+  stream_attribute.accessPolicyWindow.missProp  = cudaAccessPropertyStreaming;                // Type of access property on cache miss
+
+  cudaStreamSetAttribute(stream, cudaStreamAttributeAccessPolicyWindow, &stream_attribute);   // Set the attributes to a CUDA Stream
+
+
 
   // dim3 grid, threads;
   // grid.x = nx/(8*8);
@@ -194,11 +219,12 @@ int main(int argc, char *argv[]){
     gettimeofday(&start, NULL);
   	for(int p=0; p<n_passe; p++){
 
-  		flux_block<<<Nblocks, Nthreads>>>(u_gpu, data_3D_gpu, data_edge_x_gpu, f_gpu, nx);
+  		flux_block<<<Nblocks, Nthreads, 0, stream>>>(u_gpu, data_3D_gpu, data_edge_x_gpu, f_gpu, nx);
 
-      update_u<<<Nblocks_tot, Nthreads_tot>>>(u_gpu, f_gpu);
-
-      cudaMemset(f_gpu, 0.0f, memSize);
+      update_u<<<Nblocks_tot, Nthreads_tot, 0, stream>>>(u_gpu, f_gpu);
+      //
+      // cudaMemset(f_gpu, 0.0f, memSize);
+      //
 
       // glfwPollEvents();
   		// if(drag){
@@ -207,12 +233,12 @@ int main(int argc, char *argv[]){
       //   cudaMemcpy( u_gpu, u, memSize, cudaMemcpyHostToDevice );
   		// }
   	}
-
     gettimeofday(&end, NULL);
 
     double delta = ((end.tv_sec  - start.tv_sec) * 1000000u +
            end.tv_usec - start.tv_usec) / 1.e6;
     printf("Time taken: %f \n", delta);
+
 
 
 
@@ -245,8 +271,10 @@ int main(int argc, char *argv[]){
   // double delta = ((end.tv_sec  - start.tv_sec) * 1000000u +
   //        end.tv_usec - start.tv_usec) / 1.e6;
   // printf("Time taken: %f \n", delta);
-
-
+  //
+  stream_attribute.accessPolicyWindow.num_bytes = 0;                                          // Setting the window size to 0 disable it
+  cudaStreamSetAttribute(stream, cudaStreamAttributeAccessPolicyWindow, &stream_attribute);   // Overwrite the access policy attribute to a CUDA Stream
+  cudaCtxResetPersistingL2Cache();
 	//free memory
 	free(u);
 	free(data_3D);
