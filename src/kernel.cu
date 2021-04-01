@@ -2,9 +2,14 @@
 #include <stdio.h>
 
 #include "kernel.h"
+#include <cooperative_groups.h>
 
 
-__global__ void flux_block(float *u, float* data_3D_gpu, float* data_edge_gpu, float *flx, int nx){
+using namespace cooperative_groups;
+
+__global__ void flux_block(float *u, float* data_3D_gpu, float* data_edge_gpu, float *flx){
+	int nx = 128;
+	grid_group g = this_grid();
 	//position in the grid
 	int k = (blockIdx.x * blockDim.x + threadIdx.x);
 	int pos_x = 2*(2*k/nx) - 2;
@@ -149,13 +154,13 @@ __global__ void flux_block(float *u, float* data_3D_gpu, float* data_edge_gpu, f
 					}
 				}
 
-				if(pos_x+i == 256 && pos_y+j == 100){
-					printf("Q: u_q = %f, f = %f, delta_u = %f, W_p = %f, W_q = %f \n", u_q, f, delta_u, W_p, W_q);
-				}
-				if(pos_x+i_p == 256 && pos_y+j_p == 100){
-					printf("P: u_p = %f, f = %f, delta_u = %f, W_p = %f, W_q = %f \n", u_p, f, delta_u, W_p, W_q);
-				}
-				 __syncthreads();
+				// if(pos_x+i == 256 && pos_y+j == 100){
+				// 	printf("Q: u_q = %f, f = %f, delta_u = %f, W_p = %f, W_q = %f \n", u_q, f, delta_u, W_p, W_q);
+				// }
+				// if(pos_x+i_p == 256 && pos_y+j_p == 100){
+				// 	printf("P: u_p = %f, f = %f, delta_u = %f, W_p = %f, W_q = %f \n", u_p, f, delta_u, W_p, W_q);
+				// }
+				 g.sync();
 				 if((k+k/256)%2 == 0){
 					 if(pos_x == -2 || pos_x == nx-4 || pos_y == -2 || pos_y == nx-4){
 	 					flx[(pos_y+j+nx)%nx *nx + (pos_x+i+nx)%nx] += delta_u;
@@ -165,7 +170,7 @@ __global__ void flux_block(float *u, float* data_3D_gpu, float* data_edge_gpu, f
 	 					flx[(pos_y+j_p)*nx + (pos_x+i_p)] -= delta_u;
 	 				}
 				 }
-				 __syncthreads();
+				 g.sync();
 				 if((k+k/256)%2 == 1){
 					 if( pos_x == -2 || pos_x == nx-4 || pos_y == -2 || pos_y == nx-4){
 	 					flx[(pos_y+j+nx)%nx *nx + (pos_x+i+nx)%nx] += delta_u;
