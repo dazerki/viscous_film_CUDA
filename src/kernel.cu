@@ -102,9 +102,13 @@ __global__ void flux_block(float *u, float* data_3D_gpu, float* data_edge_gpu, f
 			for(int j=2; j<4; j++){
 				i_p = i - di;
 				j_p = j - dj;
-
-				lap_q = (u_local[5*j + (i+1)] + u_local[5*(j+1) + i] + u_local[5*(j) + i-1]);
-				lap_p = (u_local[5*j_p + (i_p-1)] + u_local[5*(j_p) + i_p+1] + u_local[5*(j_p-1) + i_p]);
+				if(direction == 0){
+					lap_q = (u_local[5*j + (i+1)] + u_local[5*(j+1) + i] + u_local[5*(j-1) + i]);
+					lap_p = (u_local[5*j_p + (i_p-1)] + u_local[5*(j_p+1) + i_p] + u_local[5*(j_p-1) + i_p]);
+				} else {
+					lap_q = (u_local[5*j + (i+1)] + u_local[5*(j+1) + i] + u_local[5*(j) + i-1]);
+					lap_p = (u_local[5*j_p + (i_p-1)] + u_local[5*(j_p) + i_p+1] + u_local[5*(j_p-1) + i_p]);
+				}
 
 				u_p = u_local[5*j_p + i_p];
 				u_q = u_local[5*j + i];
@@ -145,13 +149,33 @@ __global__ void flux_block(float *u, float* data_3D_gpu, float* data_edge_gpu, f
 					}
 				}
 
-				if(pos_x == -1 || pos_x == -2 || pos_x == nx-4 || pos_y == -1 || pos_y == -2 || pos_y == nx-4){
-					flx[(pos_y+j+nx)%nx *nx + (pos_x+i+nx)%nx] += delta_u;
-					flx[(pos_y+j_p+nx)%nx *nx + (pos_x+i_p+nx)%nx] -= delta_u;
-				} else {
-					flx[(pos_y+j)*nx + (pos_x+i)] += delta_u;
-					flx[(pos_y+j_p)*nx + (pos_x+i_p)] -= delta_u;
+				if(pos_x+i == 256 && pos_y+j == 100){
+					printf("Q: u_q = %f, f = %f, delta_u = %f, W_p = %f, W_q = %f \n", u_q, f, delta_u, W_p, W_q);
 				}
+				if(pos_x+i_p == 256 && pos_y+j_p == 100){
+					printf("P: u_p = %f, f = %f, delta_u = %f, W_p = %f, W_q = %f \n", u_p, f, delta_u, W_p, W_q);
+				}
+				 __syncthreads();
+				 if((k+k/256)%2 == 0){
+					 if(pos_x == -2 || pos_x == nx-4 || pos_y == -2 || pos_y == nx-4){
+	 					flx[(pos_y+j+nx)%nx *nx + (pos_x+i+nx)%nx] += delta_u;
+	 					flx[(pos_y+j_p+nx)%nx *nx + (pos_x+i_p+nx)%nx] -= delta_u;
+	 				} else {
+	 					flx[(pos_y+j)*nx + (pos_x+i)] += delta_u;
+	 					flx[(pos_y+j_p)*nx + (pos_x+i_p)] -= delta_u;
+	 				}
+				 }
+				 __syncthreads();
+				 if((k+k/256)%2 == 1){
+					 if( pos_x == -2 || pos_x == nx-4 || pos_y == -2 || pos_y == nx-4){
+	 					flx[(pos_y+j+nx)%nx *nx + (pos_x+i+nx)%nx] += delta_u;
+	 					flx[(pos_y+j_p+nx)%nx *nx + (pos_x+i_p+nx)%nx] -= delta_u;
+	 				} else {
+	 					flx[(pos_y+j)*nx + (pos_x+i)] += delta_u;
+	 					flx[(pos_y+j_p)*nx + (pos_x+i_p)] -= delta_u;
+	 				}
+				 }
+
 
 
 			}
