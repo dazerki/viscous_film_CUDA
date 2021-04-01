@@ -19,6 +19,8 @@ extern "C" {
 #include <sys/time.h>
 #include <cuda.h>
 
+// #include <cooperative_groups.h>
+
 
 
 #define GRID_SIZE 512
@@ -38,8 +40,8 @@ inline void gpuAssert(cudaError_t code, const char *file, int line, bool abort=t
 
 int main(int argc, char *argv[]){
 
-	int nx = 512;
-	int ny = 512;
+	int nx = 4096;
+	int ny = 4096;
 	float h = 1.0f/nx ;
 	int size = nx*ny;
 	int size_x = (nx+1)*(ny);
@@ -188,6 +190,7 @@ int main(int argc, char *argv[]){
 
   struct timeval start, end;
   // gettimeofday(&start, NULL);
+  void *arguments[] = {(void *)&u_gpu, (void *)&data_3D_gpu, (void *)&data_edge_x_gpu, (void *)&f_gpu};
 
 
 	//LOOP IN TIME
@@ -195,7 +198,8 @@ int main(int argc, char *argv[]){
     gettimeofday(&start, NULL);
   	for(int p=0; p<n_passe; p++){
 
-  		flux_block<<<Nblocks, Nthreads>>>(u_gpu, data_3D_gpu, data_edge_x_gpu, f_gpu, nx);
+  		flux_block<<<Nblocks, Nthreads>>>(u_gpu, data_3D_gpu, data_edge_x_gpu, f_gpu);
+      // cudaLaunchCooperativeKernel((void*)flux_block, Nblocks, Nthreads, arguments);
 
       update_u<<<Nblocks_tot, Nthreads_tot>>>(u_gpu, f_gpu);
       //

@@ -2,10 +2,15 @@
 #include <stdio.h>
 
 #include "kernel.h"
+// #include <cooperative_groups.h>
+
+// using namespace cooperative_groups;
 
 
-__global__ void flux_block(float *u, float* data_3D_gpu, float* data_edge_gpu, float *flx, int nx){
+__global__ void flux_block(float *u, float* data_3D_gpu, float* data_edge_gpu, float *flx){
+	int nx = 4096;
 	//position in the grid
+	// grid_group g = this_grid();
 	int pos_x = 4*(blockIdx.x * blockDim.x + threadIdx.x)-2;
 	int pos_y = 4*(blockIdx.y * blockDim.y + threadIdx.y)-2;
 
@@ -101,7 +106,7 @@ __global__ void flux_block(float *u, float* data_3D_gpu, float* data_edge_gpu, f
 			data_edge_local[(size_edge_line*(pos_block_y+j) + (i+pos_block_x))*2 + 1] = data_edge_gpu[((pos_y_data+j)*nx + (pos_x_data+i))*2 + 1];
 		}
 	}
-	__syncthreads();
+	// g.sync();
 
 	float W_q, W_p, M, theta, f, delta_u, lap_p, lap_q;
 	float H_p, H_q, T_p, T_q, ct_p, ct_q;
@@ -189,7 +194,7 @@ __global__ void flux_block(float *u, float* data_3D_gpu, float* data_edge_gpu, f
 				// if(pos_y_data+j == 32 && pos_x_data+i == 200){
 				// 	printf("Q:f = %f, val = %f, delta_u = %f, u_p = %f, u_q = %f \n", f, val, delta_u, u_p, u_q);
 				// }
-
+				// g.sync();
 				if(pos_x_data == 0 || pos_x_data == nx-4 || pos_y_data == 0 || pos_y_data == nx-4){
 					flx[((pos_y_data+j+nx)%nx) * nx + ((pos_x_data+i+nx)%nx)] += delta_u;
 					flx[((pos_y_data+j_p+nx)%nx) * nx + ((pos_x_data+i_p+nx)%nx)] -= delta_u;
