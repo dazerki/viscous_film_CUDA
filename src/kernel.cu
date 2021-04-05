@@ -2,15 +2,9 @@
 #include <stdio.h>
 
 #include "kernel.h"
-// #include <cooperative_groups.h>
 
-// using namespace cooperative_groups;
-
-
-__global__ void flux_block(float *u, float* data_3D_gpu, float* data_edge_gpu, float *flx){
-	int nx = 4096;
+__global__ void flux_block(float *u, float* data_3D_gpu, float* data_edge_gpu, float* flx_x, float* flx_y, int nx){
 	//position in the grid
-	// grid_group g = this_grid();
 	int pos_x = 4*(blockIdx.x * blockDim.x + threadIdx.x)-2;
 	int pos_y = 4*(blockIdx.y * blockDim.y + threadIdx.y)-2;
 
@@ -41,14 +35,14 @@ __global__ void flux_block(float *u, float* data_3D_gpu, float* data_edge_gpu, f
 	__shared__ float data_edge_local[2178]; // 2*(4*dimX+1)*(dimY*4+1)
 	//u local
 	if(threadIdx.x == 0){
-		for(int j=2; j<6; j++){
+		for(int j=1; j<7; j++){
 			for(int i=0; i<2; i++){
 				u_local[size_u_line*(pos_block_y+j) + (i+pos_block_x)] = u[((pos_y+j+nx)%nx)*nx + ((pos_x+i+nx)%nx)];
 			}
 		}
 	}
 	if (threadIdx.x == blockDim.x-1){
-		for(int j=0; j<4; j++){
+		for(int j=2; j<6; j++){
 			u_local[size_u_line*(pos_block_y+j) + (6+pos_block_x)] = u[((pos_y+j+nx)%nx)*nx + ((pos_x+6+nx)%nx)];
 		}
 	}
@@ -106,7 +100,7 @@ __global__ void flux_block(float *u, float* data_3D_gpu, float* data_edge_gpu, f
 			data_edge_local[(size_edge_line*(pos_block_y+j) + (i+pos_block_x))*2 + 1] = data_edge_gpu[((pos_y_data+j)*nx + (pos_x_data+i))*2 + 1];
 		}
 	}
-	// g.sync();
+	__syncthreads();
 
 	float W_q, W_p, M, theta, f, delta_u, lap_p, lap_q;
 	float H_p, H_q, T_p, T_q, ct_p, ct_q;
@@ -117,7 +111,7 @@ __global__ void flux_block(float *u, float* data_3D_gpu, float* data_edge_gpu, f
 	float u_p, u_q;
 	float h = 1.0f/nx;
 
-	float tau = 0.001f ;
+	float tau = 0.0005f ;
 	float e = 0.01f;
 	float eta = 0.00f;
 	float G = 5.0f;
@@ -139,18 +133,19 @@ __global__ void flux_block(float *u, float* data_3D_gpu, float* data_edge_gpu, f
 				if(direction == 0){
 					lap_q = (u_local[size_u_line*(pos_block_j+j) + (i+pos_block_i+1)] + u_local[size_u_line*(pos_block_j+j+1) + (i+pos_block_i)] + u_local[size_u_line*(pos_block_j+j-1) + (i+pos_block_i)]);
 					lap_p = (u_local[size_u_line*(pos_block_j+j_p) + (i_p+pos_block_i-1)] + u_local[size_u_line*(pos_block_j+j_p+1) + (i_p+pos_block_i)] + u_local[size_u_line*(pos_block_j+j_p-1) + (i_p+pos_block_i)]);
+					// if(lap_p-lap_q>0.1 || lap_q - lap_p >0.1){
+					// 	printf("HERE (i,j) = (%d,%d), u_i-1 = %f, u_j+1 = %f, u_j-1 = %f\n", i_p+pos_block_i,j_p+pos_block_j, u_local[size_u_line*(pos_block_j+j_p) + (i_p+pos_block_i-1)], u_local[size_u_line*(pos_block_j+j_p+1) + (i_p+pos_block_i)], u_local[size_u_line*(pos_block_j+j_p-1) + (i_p+pos_block_i)]);
+					// }
 				} else {
 					lap_q = (u_local[size_u_line*(pos_block_j+j) + (i+pos_block_i+1)] + u_local[size_u_line*(pos_block_j+j+1) + (i+pos_block_i)] + u_local[size_u_line*(pos_block_j+j) + (i+pos_block_i-1)]);
 					lap_p = (u_local[size_u_line*(pos_block_j+j_p) + (i_p+pos_block_i-1)] + u_local[size_u_line*(pos_block_j+j_p) + (i_p+pos_block_i+1)] + u_local[size_u_line*(pos_block_j+j_p-1) + (i_p+pos_block_i)]);
 				}
 
 
+
 				u_p = u_local[size_u_line*(pos_block_j+j_p) + (i_p+pos_block_i)];
 				u_q = u_local[size_u_line*(pos_block_j+j) + (i+pos_block_i)];
 
-				// if(blockIdx.y == 1 && threadIdx.y == 6){
-				// 	printf("Index = %d , j = %d, i = %d \n",(size_data_line*(pos_data3D_j+j) + (i+pos_data3D_i))*3);
-				// }
 				H_p = data_3D_local[(size_data_line*(pos_data3D_j+j_p) + (i_p+pos_data3D_i))*3];
 				H_q = data_3D_local[(size_data_line*(pos_data3D_j+j) + (i+pos_data3D_i))*3];
 
@@ -165,6 +160,8 @@ __global__ void flux_block(float *u, float* data_3D_gpu, float* data_edge_gpu, f
 
 				W_q = G*(nx-(pos_y_data+j)-0.5f)*h - H_q;
 				W_p = G*(nx-(pos_y_data+j_p)-0.5f)*h - H_p;
+
+
 
 
 				M = 2.0f * u_q*u_q * u_p*u_p /(3.0f*(u_q + u_p)) + (e/6.0f)*u_q*u_q*u_p*u_p*(H_E+k_E) + (beta/2.0f)*(u_p*u_p + u_q*u_q);
@@ -188,31 +185,12 @@ __global__ void flux_block(float *u, float* data_3D_gpu, float* data_edge_gpu, f
 						delta_u = -u_q;
 					}
 				}
-				// if(pos_y_data+j_p == 32 && pos_x_data+i_p == 200){
-				// 	printf("P:f = %f, val = %f, delta_u = %f, u_p = %f, u_q = %f \n", f, val, delta_u, u_p, u_q);
-				// }
-				// if(pos_y_data+j == 32 && pos_x_data+i == 200){
-				// 	printf("Q:f = %f, val = %f, delta_u = %f, u_p = %f, u_q = %f \n", f, val, delta_u, u_p, u_q);
-				// }
-				// g.sync();
-				if(pos_x_data == 0 || pos_x_data == nx-4 || pos_y_data == 0 || pos_y_data == nx-4){
-					flx[((pos_y_data+j+nx)%nx) * nx + ((pos_x_data+i+nx)%nx)] += delta_u;
-					flx[((pos_y_data+j_p+nx)%nx) * nx + ((pos_x_data+i_p+nx)%nx)] -= delta_u;
-				} else {
-					flx[(pos_y_data+j)*nx + (pos_x_data+i)] += delta_u;
-					flx[(pos_y_data+j_p)*nx + (pos_x_data+i_p)] -= delta_u;
-					// if(flx[(pos_y_data+j)*nx + (pos_x_data+i)] - flx[(pos_y_data+j_p)*nx + (pos_x_data+i_p)] > 1.0f){
-					// 	printf("HERE: i = %d, j = %d \n", pos_x_data+i, pos_y_data+j);
-					// }
-					// if(pos_y_data+j_p == 94 && pos_x_data+i_p == 255 && direction ==1){
-					// 	printf("pos y data = %d \n", pos_y_data);
-					// 	printf("HERE as p u_p = %f: delta_u = %f, flx = %f \n", u_p, delta_u, flx[(pos_y_data+j_p)*nx + (pos_x_data+i_p)]);
-					// }
-					// if(pos_y_data+j == 94 && pos_x_data+i == 255 && direction==1){
-					// 	printf("HERE as q u_q = %f: delta_u = %f, flx = %f \n", u_q, delta_u, flx[(pos_y_data+j)*nx + (pos_x_data+i)]);
-					// }
-				}
 
+				if(direction==0){
+						flx_x[(pos_y_data+j)*nx + (pos_x_data+i)] = delta_u;
+				} else {
+						flx_y[(pos_y_data+j)*nx + (pos_x_data+i)] = delta_u;
+				}
 
 			}
 		}
@@ -220,14 +198,25 @@ __global__ void flux_block(float *u, float* data_3D_gpu, float* data_edge_gpu, f
 
 }
 
-__global__ void update_u(float *u, float* flux){
+__global__ void update_u(float *u, float* flux, int dir, int flag, int nx){
 	int k = blockIdx.x * blockDim.x + threadIdx.x;
-	// if(k/512 == 32 && k%512 == 200){
-	// 	printf("before: u[k] = %f, f[k] = %f \n", u[k], flux[k]);
-	// }
-	u[k] += flux[k];
-	flux[k] = 0.0f;
-	// if(k/512 == 32 && k%512 == 200){
-	// 	printf("after: u[k] = %f, f[k] = %f \n", u[k], flux[k]);
-	// }
+	int i = k%nx;
+	int j = k/nx;
+	int i_p, j_p;
+
+	if(dir==0){ //horizontal
+		i_p = i-1;
+		j_p = j;
+	} else { //vertical
+		i_p = i;
+		j_p = j-1;
+	}
+	if((i+(nx+1)*j)%2 == flag){
+		u[k] += flux[k];
+		u[nx*((j_p+nx)%nx)+((i_p+nx)%nx)] -= flux[k];
+		flux[k] = 0.0f;
+	}
+
+
+
 }
