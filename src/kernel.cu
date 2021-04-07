@@ -111,9 +111,9 @@ __global__ void flux_block(float *u, float* data_3D_gpu, float* data_edge_gpu, f
 	float u_p, u_q;
 	float h = 1.0f/nx;
 
-	float tau = 0.0005f ;
+	float tau = 0.0002f ;
 	float e = 0.01f;
-	float eta = 0.00f;
+	float eta = 0.005f;
 	float G = 5.0f;
 	float beta = 0.0f;
 

@@ -74,9 +74,9 @@ int main(int argc, char *argv[]){
 
 	//init
 	initialization(u, nx, ny, h, 3);
-	// read_txt(height_center, height_x_edge, height_y_edge, fileName, nx);
-	// init_surface_height_map(data_3D, height_center, nx, ny, h);
-	// init_height_map_edge(data_edge_x, data_edge_y, height_x_edge, height_y_edge, nx, ny, h);
+	read_txt(height_center, height_x_edge, height_y_edge, fileName, nx);
+	init_surface_height_map(data_3D, height_center, nx, ny, h);
+	init_height_map_edge(data_edge_x, data_edge_y, height_x_edge, height_y_edge, nx, ny, h);
   cudaMemset(fx_gpu, 0.0f, memSize);
   cudaMemset(fy_gpu, 0.0f, memSize);
 
