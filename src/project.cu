@@ -37,8 +37,8 @@ inline void gpuAssert(cudaError_t code, const char *file, int line, bool abort=t
 
 int main(int argc, char *argv[]){
 
-	int nx = 512;
-	int ny = 512;
+	int nx = 4096;
+	int ny = 4096;
 	float h = 1.0f/nx ;
 	int size = nx*ny;
 	int size_x = (nx+1)*(ny);
@@ -91,8 +91,8 @@ int main(int argc, char *argv[]){
   Nblocks.x = nx/32;
   Nblocks.y = nx/32;
   Nblocks.z = 1;
-  Nthreads.x = 8;
-  Nthreads.y = 8;
+  Nthreads.x = 32;
+  Nthreads.y = 32;
   Nthreads.z = 1;
 
   int Nblocks_tot = (nx*nx)/512;
@@ -109,87 +109,87 @@ int main(int argc, char *argv[]){
 
 
   // Initialise window
-  GLFWwindow *window = init_window();
-
-  // Initialise shaders
-  init_shaders();
-
-  // Create Vertex Array Object
-  GLuint vao;
-  glGenVertexArrays(1, &vao);
-  glBindVertexArray(vao);
-
-  // Create a Vertex Buffer Object for positions
-  GLuint vbo_pos;
-  glGenBuffers(1, &vbo_pos);
-
-  GLfloat *positions = (GLfloat*) malloc(2*nx*nx*sizeof(GLfloat));
-
-  for (int i = 0; i < nx; i++) {
-      for (int j = 0; j < nx; j++) {
-          int ind = j*nx+i;
-          positions[2*ind  ] = (float)(1.0 - 2.0*i/(nx-1));
-          positions[2*ind+1] = (float)(1.0 - 2.0*j/(nx-1));
-      }
-  }
-
-  glBindBuffer(GL_ARRAY_BUFFER, vbo_pos);
-  glBufferData(GL_ARRAY_BUFFER, 2*nx*nx*sizeof(GLfloat), positions, GL_STATIC_DRAW);
-  printf("HERE \n" );
-  // Specify vbo_pos' layout
-  GLint posAttrib = glGetAttribLocation(shaderProgram, "position");
-  glEnableVertexAttribArray(posAttrib);
-  glVertexAttribPointer(posAttrib, 2, GL_FLOAT, GL_FALSE, 0, (void*)0);
-
-  // Create an Element Buffer Object and copy the element data to it
-  GLuint ebo;
-  glGenBuffers(1, &ebo);
-
-  GLuint *elements = (GLuint*) malloc(4*(nx-1)*(nx-1)*sizeof(GLuint));
-    for (int i = 0; i < nx-1; i++) {
-        for (int j = 0; j < nx-1; j++) {
-            int ind  = i*nx+j;
-            int ind_ = i*(nx-1)+j;
-
-            elements[4*ind_  ] = ind;
-            elements[4*ind_+1] = ind+1;
-            elements[4*ind_+2] = ind+nx;
-            elements[4*ind_+3] = ind+nx+1;
-        }
-    }
-
-  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
-  glBufferData(GL_ELEMENT_ARRAY_BUFFER, 4*(nx-1)*(nx-1)*sizeof(GLuint), elements, GL_STATIC_DRAW);
-
-	// Create a Vertex Buffer Object for colors
-  GLuint vbo_colors;
-  glGenBuffers(1, &vbo_colors);
-
-  GLfloat *colors = (GLfloat*) malloc(nx*nx*sizeof(GLfloat));
-  for (int i = 0; i < nx; i++) {
-      for (int j = 0; j < nx; j++) {
-          int ind = i*nx+j;
-          colors[ind] = (float) u[ind];
-      }
-  }
-
-  glBindBuffer(GL_ARRAY_BUFFER, vbo_colors);
-  glBufferData(GL_ARRAY_BUFFER, nx*nx*sizeof(GLfloat), colors, GL_STREAM_DRAW);
-
-  // Specify vbo_color's layout
-  GLint colAttrib = glGetAttribLocation(shaderProgram, "color");
-  glEnableVertexAttribArray(colAttrib);
-  glVertexAttribPointer(colAttrib, 1, GL_FLOAT, GL_FALSE, 0, (void*)0);
+  // GLFWwindow *window = init_window();
+  //
+  // // Initialise shaders
+  // init_shaders();
+  //
+  // // Create Vertex Array Object
+  // GLuint vao;
+  // glGenVertexArrays(1, &vao);
+  // glBindVertexArray(vao);
+  //
+  // // Create a Vertex Buffer Object for positions
+  // GLuint vbo_pos;
+  // glGenBuffers(1, &vbo_pos);
+  //
+  // GLfloat *positions = (GLfloat*) malloc(2*nx*nx*sizeof(GLfloat));
+  //
+  // for (int i = 0; i < nx; i++) {
+  //     for (int j = 0; j < nx; j++) {
+  //         int ind = j*nx+i;
+  //         positions[2*ind  ] = (float)(1.0 - 2.0*i/(nx-1));
+  //         positions[2*ind+1] = (float)(1.0 - 2.0*j/(nx-1));
+  //     }
+  // }
+  //
+  // glBindBuffer(GL_ARRAY_BUFFER, vbo_pos);
+  // glBufferData(GL_ARRAY_BUFFER, 2*nx*nx*sizeof(GLfloat), positions, GL_STATIC_DRAW);
+  // printf("HERE \n" );
+  // // Specify vbo_pos' layout
+  // GLint posAttrib = glGetAttribLocation(shaderProgram, "position");
+  // glEnableVertexAttribArray(posAttrib);
+  // glVertexAttribPointer(posAttrib, 2, GL_FLOAT, GL_FALSE, 0, (void*)0);
+  //
+  // // Create an Element Buffer Object and copy the element data to it
+  // GLuint ebo;
+  // glGenBuffers(1, &ebo);
+  //
+  // GLuint *elements = (GLuint*) malloc(4*(nx-1)*(nx-1)*sizeof(GLuint));
+  //   for (int i = 0; i < nx-1; i++) {
+  //       for (int j = 0; j < nx-1; j++) {
+  //           int ind  = i*nx+j;
+  //           int ind_ = i*(nx-1)+j;
+  //
+  //           elements[4*ind_  ] = ind;
+  //           elements[4*ind_+1] = ind+1;
+  //           elements[4*ind_+2] = ind+nx;
+  //           elements[4*ind_+3] = ind+nx+1;
+  //       }
+  //   }
+  //
+  // glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
+  // glBufferData(GL_ELEMENT_ARRAY_BUFFER, 4*(nx-1)*(nx-1)*sizeof(GLuint), elements, GL_STATIC_DRAW);
+  //
+	// // Create a Vertex Buffer Object for colors
+  // GLuint vbo_colors;
+  // glGenBuffers(1, &vbo_colors);
+  //
+  // GLfloat *colors = (GLfloat*) malloc(nx*nx*sizeof(GLfloat));
+  // for (int i = 0; i < nx; i++) {
+  //     for (int j = 0; j < nx; j++) {
+  //         int ind = i*nx+j;
+  //         colors[ind] = (float) u[ind];
+  //     }
+  // }
+  //
+  // glBindBuffer(GL_ARRAY_BUFFER, vbo_colors);
+  // glBufferData(GL_ARRAY_BUFFER, nx*nx*sizeof(GLfloat), colors, GL_STREAM_DRAW);
+  //
+  // // Specify vbo_color's layout
+  // GLint colAttrib = glGetAttribLocation(shaderProgram, "color");
+  // glEnableVertexAttribArray(colAttrib);
+  // glVertexAttribPointer(colAttrib, 1, GL_FLOAT, GL_FALSE, 0, (void*)0);
 
 	// PARAMETER
 	// float tau = 0.01f ;
-	int n_passe = 10;
+	int n_passe = 10000;
 
   struct timeval start, end;
   // gettimeofday(&start, NULL);
 
 	//LOOP IN TIME
-  while(!glfwWindowShouldClose(window)) {
+  // while(!glfwWindowShouldClose(window)) {
     gettimeofday(&start, NULL);
   	for(int p=0; p<n_passe; p++){
 
@@ -219,32 +219,32 @@ int main(int argc, char *argv[]){
 
 
 
-  	cudaMemcpy( u, u_gpu, size*sizeof(float), cudaMemcpyDeviceToHost );
-    // printf("u en i,j = 250, 100 = %f \n", u[nx*100+250]);
+  	// cudaMemcpy( u, u_gpu, size*sizeof(float), cudaMemcpyDeviceToHost );
+    // // printf("u en i,j = 250, 100 = %f \n", u[nx*100+250]);
+    //
+    // glfwSwapBuffers(window);
+  	// glfwPollEvents();
+    //
+  	// // Clear the screen to black
+  	// glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+  	// glClear(GL_COLOR_BUFFER_BIT);
+    //
+  	// for (int i = 0; i < nx*nx; i++) {
+  	// 		colors[i] = (float) (u[i]);
+  	// }
+    //
+  	// glBindBuffer(GL_ARRAY_BUFFER, vbo_colors);
+  	// glBufferData(GL_ARRAY_BUFFER, nx*nx*sizeof(GLfloat), colors, GL_STREAM_DRAW);
+    //
+    //
+  	// // Draw elements
+  	// glDrawElements(GL_LINES_ADJACENCY, 4*(nx-1)*(nx-1), GL_UNSIGNED_INT, 0);
+    //
+  	// if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
+  	// 		glfwSetWindowShouldClose(window, GL_TRUE);
 
-    glfwSwapBuffers(window);
-  	glfwPollEvents();
-
-  	// Clear the screen to black
-  	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
-  	glClear(GL_COLOR_BUFFER_BIT);
-
-  	for (int i = 0; i < nx*nx; i++) {
-  			colors[i] = (float) (u[i]);
-  	}
-
-  	glBindBuffer(GL_ARRAY_BUFFER, vbo_colors);
-  	glBufferData(GL_ARRAY_BUFFER, nx*nx*sizeof(GLfloat), colors, GL_STREAM_DRAW);
-
-
-  	// Draw elements
-  	glDrawElements(GL_LINES_ADJACENCY, 4*(nx-1)*(nx-1), GL_UNSIGNED_INT, 0);
-
-  	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
-  			glfwSetWindowShouldClose(window, GL_TRUE);
-
-    // getchar();
-  }
+    // // getchar();
+  // }
   //
   // gettimeofday(&end, NULL);
   //
