@@ -38,13 +38,17 @@ inline void gpuAssert(cudaError_t code, const char *file, int line, bool abort=t
 
 int main(int argc, char *argv[]){
 
-	int nx = 4096;
-	int ny = 4096;
+	int nx = 512;
+	int ny = 512;
 	float h = 1.0f/nx ;
 	int size = nx*ny;
 	int size_x = (nx+1)*(ny);
 	int size_y = nx*(ny+1);
   int size_3D = 3*size;
+
+  // FILE *fpt;
+	// fpt = fopen("tau-0_001-t-3-G-5-obstacle2.txt", "w+");
+  // int counter_file = 0;
 
 	// memory allocation
 	u = (float*)calloc(size, sizeof(float));
@@ -70,9 +74,9 @@ int main(int argc, char *argv[]){
 
 	//init
 	initialization(u, nx, ny, h, 3);
-	// read_txt(height_center, height_x_edge, height_y_edge, fileName, nx);
-	// init_surface_height_map(data_3D, height_center, nx, ny, h);
-	// init_height_map_edge(data_edge_x, data_edge_y, height_x_edge, height_y_edge, nx, ny, h);
+	read_txt(height_center, height_x_edge, height_y_edge, fileName, nx);
+	init_surface_height_map(data_3D, height_center, nx, ny, h);
+	init_height_map_edge(data_edge_x, data_edge_y, height_x_edge, height_y_edge, nx, ny, h);
 
 
 
@@ -160,7 +164,7 @@ int main(int argc, char *argv[]){
 	// float tau = 0.01f ;
 	int n_passe = 10;
 
-  struct timeval start, end;
+  // struct timeval start, end;
   // gettimeofday(&start, NULL);
 
 // gettimeofday(&start, NULL);
@@ -212,6 +216,17 @@ int main(int argc, char *argv[]){
 
   	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
   			glfwSetWindowShouldClose(window, GL_TRUE);
+
+    // counter_file ++;
+    // if(counter_file == 300){
+    //   for(int j=0; j<ny; j++){
+    // 		for(int i=0; i<nx; i++){
+    // 			fprintf(fpt, "%f ", u[nx*j + i]);
+    // 		}
+    // 		fprintf(fpt, "\n");
+    // 	}
+    //   exit(0);
+    // }
 
   }
 

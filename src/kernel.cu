@@ -9,8 +9,8 @@ __global__ void flux_x(float *u, float *data_3D, float *data_edge, int rho)
 	// int j = blockIdx.y * blockDim.y + threadIdx.y;
 	int k = blockIdx.x * blockDim.x + threadIdx.x;
   int rho_ij;
-	int nx = 4096;
-	int ny = 4096;
+	int nx = 512;
+	int ny = 512;
 	int di = 1;
 	int dj = 0;
 
@@ -29,9 +29,9 @@ __global__ void flux_x(float *u, float *data_3D, float *data_edge, int rho)
 		float u_p, u_q;
 	  float h = 1.0f/nx;
 
-	  float tau = 0.0001f ;
+	  float tau = 0.001f ;
 		float e = 0.01f;
-		float eta = 0.001f;
+		float eta = 0.005f;
 		float G = 5.0f;
 		float beta = 0.0f;
 		if (i==0){
@@ -111,8 +111,8 @@ __global__ void flux_y(float *u, float *data_3D, float *data_edge, int rho)
 	// int j = blockIdx.y * blockDim.y + threadIdx.y;
 	int k = blockIdx.x * blockDim.x + threadIdx.x;
   int rho_ij;
-	int nx = 4096;
-	int ny = 4096;
+	int nx = 512;
+	int ny = 512;
 	int di = 0;
 	int dj = 1;
 
@@ -132,9 +132,9 @@ __global__ void flux_y(float *u, float *data_3D, float *data_edge, int rho)
 		float u_p, u_q;
 	  float h = 1.0f/nx;
 
-	  float tau = 0.0001f ;
+	  float tau = 0.001f ;
 		float e = 0.01f;
-		float eta = 0.001f;
+		float eta = 0.005f;
 		float G = 5.0f;
 		float beta = 0.0f;
 		if (j==0){
