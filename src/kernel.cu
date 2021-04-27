@@ -24,8 +24,6 @@ __global__ void flux_x(float *u, float *data_3D, float *data_edge, int rho)
 
 		int i_p, j_p;
 		float W_q, W_p, M, theta, f, delta_u, lap_p, lap_q;
-		float H_p, H_q, T_p, T_q, ct_p, ct_q;
-		float k_E, H_E;
 		float u_p, u_q;
 	  float h = 1.0f/nx;
 
@@ -33,7 +31,6 @@ __global__ void flux_x(float *u, float *data_3D, float *data_edge, int rho)
 		float e = 0.01f;
 		float eta = 0.005f;
 		float G = 5.0f;
-		float beta = 0.0f;
 		if (i==0){
 			i_p = nx - 1;
 			j_p = j - dj;
@@ -54,28 +51,13 @@ __global__ void flux_x(float *u, float *data_3D, float *data_edge, int rho)
 		u_p = u[nx*j_p + i_p];
 		u_q = u[nx*j + i];
 
-		H_p = data_3D[(nx*j_p + i_p)*3];
-		H_q = data_3D[(nx*j + i)*3];
+		W_q = G*(ny-j-0.5f)*h;
+		W_p = G*(ny-j_p-0.5f)*h;
 
-		T_p = data_3D[(nx*j_p + i_p)*3 + 1];
-		T_q = data_3D[(nx*j + i)*3 + 1];
+		M = 2.0f * u_p*u_p * u_q*u_q /(3.0f*(u_q + u_p));
 
-		ct_p = data_3D[(nx*j_p + i_p)*3 + 2];
-		ct_q = data_3D[(nx*j + i)*3 + 2];
-
-		if(((nx+1)*j + i)*2 + 1 > (nx+1)*nx*2){
-			printf("i = %d, j = %d \n", i, j);
-		}
-		k_E = data_edge[((nx+1)*j + i)*2];
-		H_E = data_edge[((nx+1)*j + i)*2 + 1];
-
-		W_q = G*(ny-j-0.5f)*h - H_q;
-		W_p = G*(ny-j_p-0.5f)*h - H_p;
-
-		M = 2.0f * u_p*u_p * u_q*u_q /(3.0f*(u_q + u_p)) + (e/6.0f)*u_q*u_q*u_p*u_p*(H_E+k_E) + (beta/2.0f)*(u_p*u_p + u_q*u_q);
-
-		theta = h*h + (tau*M*(4.0f*e + 2.0f*eta + G*e*(ct_p + ct_q) - e*(T_p + T_q)));
-		f = (M*h/(theta)) * (eta*(u_p - u_q) + (e/2.0f)*(lap_q - lap_p + 5.0f*(u_p-u_q)) + W_p-W_q + e*((G*ct_q - T_q)*u_q - (G*ct_p - T_p)*u_p));
+		theta = h*h + (tau*M*(4.0f*e + 2.0f*eta));
+		f = (M*h/(theta)) * (eta*(u_p - u_q) + (e/2.0f)*(lap_q - lap_p + 5.0f*(u_p-u_q)) + W_p-W_q);
 
 		float val = tau*f/h;
 		if(u_p<val){
@@ -125,8 +107,6 @@ __global__ void flux_y(float *u, float *data_3D, float *data_edge, int rho)
 	if (rho_ij == 3){
 
 		float W_q, W_p, M, theta, f, delta_u, lap_p, lap_q;
-		float H_p, H_q, T_p, T_q, ct_p, ct_q;
-		float k_E, H_E;
 		int i_p, j_p;
 
 		float u_p, u_q;
@@ -136,7 +116,7 @@ __global__ void flux_y(float *u, float *data_3D, float *data_edge, int rho)
 		float e = 0.01f;
 		float eta = 0.005f;
 		float G = 5.0f;
-		float beta = 0.0f;
+
 		if (j==0){
 			i_p = i - di;
 			j_p = ny - 1;
@@ -157,30 +137,18 @@ __global__ void flux_y(float *u, float *data_3D, float *data_edge, int rho)
 		u_p = u[nx*j_p + i_p];
 		u_q = u[nx*j + i];
 
-		H_p = data_3D[(nx*j_p + i_p)*3];
-		H_q = data_3D[(nx*j + i)*3];
-
-		T_p = data_3D[(nx*j_p + i_p)*3 + 1];
-		T_q = data_3D[(nx*j + i)*3 + 1];
-
-		ct_p = data_3D[(nx*j_p + i_p)*3 + 2];
-		ct_q = data_3D[(nx*j + i)*3 + 2];
-
-		k_E = data_edge[((nx)*j + i)*2];
-		H_E = data_edge[((nx)*j + i)*2 + 1];
-
-		W_q = G*(ny-j-0.5f)*h - H_q;
+		W_q = G*(ny-j-0.5f)*h;
 
 		if(j==0){
-			W_p = G*(ny-(-1.0f)-0.5f)*h - H_p;
+			W_p = G*(ny-(-1.0f)-0.5f)*h;
 		}else{
-			W_p = G*(ny-j_p-0.5f)*h - H_p;
+			W_p = G*(ny-j_p-0.5f)*h;
 		}
 
-		M = 2.0f * u_q*u_q * u_p*u_p /(3.0f*(u_q + u_p)) + (e/6.0f)*u_q*u_q*u_p*u_p*(H_E+k_E) + (beta/2.0f)*(u_p*u_p + u_q*u_q);
+		M = 2.0f * u_q*u_q * u_p*u_p /(3.0f*(u_q + u_p));
 
-		theta = h*h + (tau*M*(4.0f*e + 2.0f*eta + G*e*(ct_p + ct_q) - e*(T_p + T_q)));
-		f = (M*h/(theta)) * (eta*(u_p - u_q) + (e/2.0f)*(lap_q - lap_p + 5.0f*(u_p-u_q)) + W_p-W_q + e*((G*ct_q - T_q)*u_q - (G*ct_p - T_p)*u_p));
+		theta = h*h + (tau*M*(4.0f*e + 2.0f*eta));
+		f = (M*h/(theta)) * (eta*(u_p - u_q) + (e/2.0f)*(lap_q - lap_p + 5.0f*(u_p-u_q)) + W_p-W_q);
 
 		float val = tau*f/h;
 		if(u_p<val){

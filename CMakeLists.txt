@@ -6,7 +6,7 @@ project(Project LANGUAGES C CUDA)
 # Exec name
 set(EXEC_NAME project)
 set(CMAKE_C_FLAGS "-O3")
-set(CMAKE_CUDA_FLAGS "-lineinfo")
+# set(CMAKE_CUDA_FLAGS "-lineinfo")
 
 # CMake module
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/")
@@ -44,4 +44,4 @@ file(GLOB CUDA_SRCS
 add_executable(${EXEC_NAME} ${C_SRCS} ${CUDA_SRCS})
 target_link_libraries(${EXEC_NAME} ${PYTHON_LIBRARIES} ${OPENMP_C_LIBRARIES} ${GLEW_LIBRARIES} ${GLFW3_LIBRARY} ${OPENGL_LIBRARY} pthread m)
 set_property(TARGET ${EXEC_NAME} PROPERTY CUDA_ARCHITECTURES 70-real 72-virtual)
-set_property(TARGET ${EXEC_NAME} PROPERTY CUDA_FLAG lineinfo)
+# set_property(TARGET ${EXEC_NAME} PROPERTY CUDA_FLAG lineinfo)
