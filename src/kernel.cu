@@ -170,25 +170,20 @@ __global__ void flux_block(float *u, float* data_3D_gpu, float* data_edge_gpu, f
 
 }
 
-__global__ void update_u(float *u, float* flux, int dir, int flag, int nx){
+__global__ void update_u(float *u, float* flux_x, float* flux_y, int nx){
 	int k = blockIdx.x * blockDim.x + threadIdx.x;
 	int i = k%nx;
 	int j = k/nx;
-	int i_p, j_p;
 
-	if(dir==0){ //horizontal
-		i_p = i-1;
-		j_p = j;
-	} else { //vertical
-		i_p = i;
-		j_p = j-1;
+	if(i == nx-1){
+		if(j == nx-1){
+			u[k] = u[k] + flux_x[k] + flux_y[k] - flux_x[nx*j] - flux_y[i];
+		} else {
+			u[k] = u[k] + flux_x[k] + flux_y[k] - flux_x[nx*j] - flux_y[nx*(j+1)+i];
+		}
+	} else if(j == nx-1){
+		u[k] = u[k] + flux_x[k] + flux_y[k] - flux_x[nx*j+i+1] - flux_y[i];
+	} else {
+		u[k] = u[k] + flux_x[k] + flux_y[k] - flux_x[nx*j+i+1] - flux_y[nx*(j+1)+i];
 	}
-	if((i+(nx+1)*j)%2 == flag){
-		u[k] += flux[k];
-		u[nx*((j_p+nx)%nx)+((i_p+nx)%nx)] -= flux[k];
-		flux[k] = 0.0f;
-	}
-
-
-
 }
