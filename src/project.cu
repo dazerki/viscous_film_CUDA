@@ -62,9 +62,6 @@ int main(int argc, char *argv[]){
 
 
 	cudaMemcpy( u_gpu, u, memSize, cudaMemcpyHostToDevice );
-	cudaMemcpy( data_3D_gpu, data_3D, memSize_3D, cudaMemcpyHostToDevice );
-	cudaMemcpy( data_edge_x_gpu, data_edge_x, 2*size_x*sizeof(float), cudaMemcpyHostToDevice );
-	cudaMemcpy( data_edge_y_gpu, data_edge_y, 2*size_y*sizeof(float), cudaMemcpyHostToDevice );
 
   int Nblocks = (nx*nx + 255)/256;
   int Nthreads = 256;
@@ -153,11 +150,11 @@ int main(int argc, char *argv[]){
   // while(!glfwWindowShouldClose(window)) {
   	for(int p=0; p<n_passe; p++){
   		for(int rho=0; rho<4; rho++){
-  			flux_x<<<Nblocks, Nthreads>>>(u_gpu, data_3D_gpu, data_edge_x_gpu, rho);
+  			flux_x<<<Nblocks, Nthreads>>>(u_gpu, rho);
   		}
 
   		for(int rho=0; rho<4; rho++){
-  			flux_y<<<Nblocks, Nthreads>>>(u_gpu, data_3D_gpu, data_edge_y_gpu, rho);
+  			flux_y<<<Nblocks, Nthreads>>>(u_gpu, rho);
   		}
 
       // glfwPollEvents();

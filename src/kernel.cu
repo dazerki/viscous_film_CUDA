@@ -3,7 +3,7 @@
 
 #include "kernel.h"
 
-__global__ void flux_x(float *u, float *data_3D, float *data_edge, int rho)
+__global__ void flux_x(float *u, int rho)
 {
 	// int i = blockIdx.x * blockDim.x + threadIdx.x;
 	// int j = blockIdx.y * blockDim.y + threadIdx.y;
@@ -86,7 +86,7 @@ __global__ void flux_x(float *u, float *data_3D, float *data_edge, int rho)
 	}
 }
 
-__global__ void flux_y(float *u, float *data_3D, float *data_edge, int rho)
+__global__ void flux_y(float *u, int rho)
 {
 	//int k = blockIdx.x * blockDim.x + threadIdx.x;
 	// int i = blockIdx.x * blockDim.x + threadIdx.x;
