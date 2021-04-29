@@ -27,7 +27,22 @@ void initialization(float* u, int nx, int ny,  float h, int choice){
   else if(choice == 4) {
     merging_gaussian(u, nx, ny, h);
   }
+  else if(choice == 5){
+    big_line(u, nx, ny, 0.2f);
+    perturbation(u, nx, ny, 90*3.141592, 0.001f, h);
+  }
 
+}
+
+void perturbation(float* u, int nx, int ny, float k, float value, float h){
+  int i,j;
+  for(int index=0; index<nx*ny; index++){
+    i = index % nx;
+    j = index / nx;
+    if(j>100 && j<140){
+      u[index] = u[index] + value*sin(k*i*h);
+    }
+  }
 }
 
 void gaussians(float* u, int nx, int ny, float h){
@@ -109,7 +124,7 @@ void simple_gaussian(float* u, int nx, int ny, float h){
 }
 
 void big_line(float* u, int nx, int ny, float value){
-  for(int index=350*nx ; index<390*nx ; index++){
+  for(int index=100*nx ; index<140*nx ; index++){
 		u[index] = value;
 	}
 }

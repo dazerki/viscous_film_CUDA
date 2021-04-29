@@ -31,7 +31,7 @@ __global__ void flux_x(float *u, float *data_3D, float *data_edge, int rho)
 
 	  float tau = 0.001f ;
 		float e = 0.01f;
-		float eta = 0.005f;
+		float eta = 0.00f;
 		float G = 5.0f;
 		float beta = 0.0f;
 		if (i==0){
@@ -93,8 +93,8 @@ __global__ void flux_x(float *u, float *data_3D, float *data_edge, int rho)
 		}
 
 		if(i == 0){
-			u[nx*(j+nx)%nx + (i+nx)%nx] += delta_u;
-			u[nx*(j_p+nx)%nx + (i_p+nx)%nx] -= delta_u;
+			u[nx*((j+nx)%nx) + ((i+nx)%nx)] += delta_u;
+			u[nx*((j_p+nx)%nx) + ((i_p+nx)%nx)] -= delta_u;
 		} else {
 			u[nx*j + i] += delta_u;
 			u[nx*j_p + i_p] -= delta_u;
@@ -134,7 +134,7 @@ __global__ void flux_y(float *u, float *data_3D, float *data_edge, int rho)
 
 	  float tau = 0.001f ;
 		float e = 0.01f;
-		float eta = 0.005f;
+		float eta = 0.00f;
 		float G = 5.0f;
 		float beta = 0.0f;
 		if (j==0){
