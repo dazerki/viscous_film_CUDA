@@ -183,7 +183,7 @@ int main(int argc, char *argv[]){
 
 	// PARAMETER
 	// float tau = 0.01f ;
-	int n_passe = 10000;
+	int n_passe = 10;
 
   struct timeval start, end;
   // gettimeofday(&start, NULL);
