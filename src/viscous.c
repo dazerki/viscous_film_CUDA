@@ -6,7 +6,7 @@
 void initialization(float* u, int nx, int ny,  float h, int choice){
 
   for(int i=0; i<nx*ny; i++){
-    u[i] = 0.04f; // 0.0001
+    u[i] = 0.2f; // 0.0001
 	}
 
   // GAUSSIANS
@@ -17,8 +17,8 @@ void initialization(float* u, int nx, int ny,  float h, int choice){
   }
   // Center circle + line
   else if(choice == 2) {
-    simple_gaussian(u, nx, ny, h);
-    float_circle(u, nx, ny, 0.0f);
+    // simple_gaussian(u, nx, ny, h);
+    circle(u, nx, ny, 1.0f);
   }
 
   else if(choice == 3) {
@@ -31,7 +31,7 @@ void initialization(float* u, int nx, int ny,  float h, int choice){
 }
 
 void gaussians(float* u, int nx, int ny, float h){
-
+  h = 1.0f/nx;
   float mu_x[5] = {0.19f, 0.2f, 0.56f, 0.6f, 0.9f};
 	float mu_y[5] = {0.8f, 0.45f, 0.7f, 0.3f, 0.5f};
 	float sigma_x[5] = {0.1f, 0.1f, 0.1f, 0.1f, 0.1f};
@@ -50,7 +50,7 @@ void gaussians(float* u, int nx, int ny, float h){
 			x = i*h;
 			y = j*h;
 
-			density = (float)(1.0f/(100.0f*2.0f*M_PI*sigma_x[l]*sigma_y[l])) * exp(-(1.0f/2.0f)*((x-mu_x[l])*(x-mu_x[l])/(sigma_x[l]*sigma_x[l]) + (y-mu_y[l])*(y-mu_y[l])/(sigma_y[l]*sigma_y[l])));
+			density = (float)(1.0f/(30.0f*2.0f*M_PI*sigma_x[l]*sigma_y[l])) * exp(-(1.0f/2.0f)*((x-mu_x[l])*(x-mu_x[l])/(sigma_x[l]*sigma_x[l]) + (y-mu_y[l])*(y-mu_y[l])/(sigma_y[l]*sigma_y[l])));
 			if (density > u[index]){
 				u[index] = density;
 				if (density > max){
