@@ -43,9 +43,9 @@ int main(int argc, char *argv[]){
 	float h = 1.0f/nx;
 	int size = nx*ny;
 
-  // FILE *fpt;
-	// fpt = fopen("tau-0_001-t-3-G-5-obstacle2.txt", "w+");
-  // int counter_file = 0;
+  FILE *fpt;
+	fpt = fopen("./results/obstacle/tau-0_00001-t-3-G-5-bis.txt", "w+");
+  int counter_file = 0;
 
 	// memory allocation
 	u = (float*)calloc(size, sizeof(float));
@@ -58,7 +58,7 @@ int main(int argc, char *argv[]){
 	cudaMalloc( (void**)&u_gpu, memSize );
 
 	//init
-	initialization(u, nx, ny, h, 1);
+	initialization(u, nx, ny, h, 6);
 
 
 	cudaMemcpy( u_gpu, u, memSize, cudaMemcpyHostToDevice );
@@ -157,12 +157,12 @@ int main(int argc, char *argv[]){
   			flux_y<<<Nblocks, Nthreads>>>(u_gpu, rho);
   		}
 
-      // glfwPollEvents();
-  		// if(drag){
-      //   cudaMemcpy( u, u_gpu, size*sizeof(float), cudaMemcpyDeviceToHost );
-  		// 	add_fluid(window);
-      //   cudaMemcpy( u_gpu, u, memSize, cudaMemcpyHostToDevice );
-  		// }
+      glfwPollEvents();
+  		if(drag){
+        cudaMemcpy( u, u_gpu, size*sizeof(float), cudaMemcpyDeviceToHost );
+  			add_fluid(window);
+        cudaMemcpy( u_gpu, u, memSize, cudaMemcpyHostToDevice );
+  		}
   	}
     gettimeofday(&end, NULL);
 
@@ -195,16 +195,16 @@ int main(int argc, char *argv[]){
   	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
   			glfwSetWindowShouldClose(window, GL_TRUE);
 
-    // counter_file ++;
-    // if(counter_file == 300){
-    //   for(int j=0; j<ny; j++){
-    // 		for(int i=0; i<nx; i++){
-    // 			fprintf(fpt, "%f ", u[nx*j + i]);
-    // 		}
-    // 		fprintf(fpt, "\n");
-    // 	}
-    //   exit(0);
-    // }
+    counter_file ++;
+    if(counter_file == 3000){
+      for(int j=0; j<ny; j++){
+    		for(int i=0; i<nx; i++){
+    			fprintf(fpt, "%f ", u[nx*j + i]);
+    		}
+    		fprintf(fpt, "\n");
+    	}
+      exit(0);
+    }
 
   }
 

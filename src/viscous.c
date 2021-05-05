@@ -6,7 +6,7 @@
 void initialization(float* u, int nx, int ny,  float h, int choice){
 
   for(int i=0; i<nx*ny; i++){
-    u[i] = 0.2f; // 0.0001
+    u[i] = 0.2f;
 	}
 
   // GAUSSIANS
@@ -24,10 +24,33 @@ void initialization(float* u, int nx, int ny,  float h, int choice){
   else if(choice == 3) {
     simple_gaussian(u, nx, ny, h);
   }
+
   else if(choice == 4) {
     merging_gaussian(u, nx, ny, h);
   }
 
+  else if (choice == 5){
+    big_line(u, nx, ny, 0.8f);
+    perturbation(u, nx, ny, 30*3.141592, 0.01f, h);
+  }
+
+  else if (choice == 6){
+    simple_gaussian(u, nx, ny, h);
+    float_circle(u, nx, ny, 0.0f);
+
+  }
+
+}
+
+void perturbation(float* u, int nx, int ny, float k, float value, float h){
+  int i,j;
+  for(int index=0; index<nx*ny; index++){
+    i = index % nx;
+    j = index / nx;
+    if(j>100 && j<140){
+      u[index] = u[index] + value*sin(k*i*h);
+    }
+  }
 }
 
 void gaussians(float* u, int nx, int ny, float h){
@@ -73,7 +96,7 @@ void circle(float* u, int nx, int ny, float value){
 
 void float_circle(float* u, int nx, int ny, float value){
   for(int i=0; i<nx*ny; i++){
-    if((((i/nx - 200)*(i/nx - 200) + (i%nx -170)*(i%nx - 170) < 75*75) && i/nx < 175) || (((i/nx - 200)*(i/nx - 200) + (i%nx -342)*(i%nx - 342) < 75*75) && i/nx < 175)){
+    if((((i/nx - 200)*(i/nx - 200) + (i%nx -170)*(i%nx - 170) < 75*75) && i/nx > 225) || (((i/nx - 200)*(i/nx - 200) + (i%nx -342)*(i%nx - 342) < 75*75) && i/nx > 225)){
 			u[i] = value;
 		}
   }
@@ -81,7 +104,7 @@ void float_circle(float* u, int nx, int ny, float value){
 
 void simple_gaussian(float* u, int nx, int ny, float h){
   float mu_x[1] = {0.5f};
-	float mu_y[1] = {0.15f};
+	float mu_y[1] = {0.33f};
 	float sigma_x[1] = {0.1f};
 	float sigma_y[1] = {0.07f};
 	float density, x, y;
@@ -96,7 +119,7 @@ void simple_gaussian(float* u, int nx, int ny, float h){
 			x = i*h;
 			y = j*h;
 
-			density = (1.0f/(50.0f*2.0f*M_PI*sigma_x[l]*sigma_y[l])) * exp(-(1.0f/2.0f)*((x-mu_x[l])*(x-mu_x[l])/(sigma_x[l]*sigma_x[l]) + (y-mu_y[l])*(y-mu_y[l])/(sigma_y[l]*sigma_y[l])));
+			density = (1.0f/(30.0f*2.0f*M_PI*sigma_x[l]*sigma_y[l])) * exp(-(1.0f/2.0f)*((x-mu_x[l])*(x-mu_x[l])/(sigma_x[l]*sigma_x[l]) + (y-mu_y[l])*(y-mu_y[l])/(sigma_y[l]*sigma_y[l])));
 			if (density > u[index]){
 				u[index] = density;
 				if (density > max){
@@ -109,7 +132,7 @@ void simple_gaussian(float* u, int nx, int ny, float h){
 }
 
 void big_line(float* u, int nx, int ny, float value){
-  for(int index=350*nx ; index<390*nx ; index++){
+  for(int index=100*nx ; index<140*nx ; index++){
 		u[index] = value;
 	}
 }
@@ -131,7 +154,7 @@ void merging_gaussian(float* u, int nx, int ny, float h){
 			x = i*h;
 			y = j*h;
 
-			density = (1.0f/(50.0f*2.0f*M_PI*sigma_x[l]*sigma_y[l])) * exp(-(1.0f/2.0f)*((x-mu_x[l])*(x-mu_x[l])/(sigma_x[l]*sigma_x[l]) + (y-mu_y[l])*(y-mu_y[l])/(sigma_y[l]*sigma_y[l])));
+			density = (1.0f/(20.0f*2.0f*M_PI*sigma_x[l]*sigma_y[l])) * exp(-(1.0f/2.0f)*((x-mu_x[l])*(x-mu_x[l])/(sigma_x[l]*sigma_x[l]) + (y-mu_y[l])*(y-mu_y[l])/(sigma_y[l]*sigma_y[l])));
 			if (density > u[index]){
 				u[index] = density;
 				if (density > max){
