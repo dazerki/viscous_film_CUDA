@@ -6,7 +6,7 @@
 void initialization(float* u, int nx, int ny,  float h, int choice){
 
   for(int i=0; i<nx*ny; i++){
-    u[i] = 0.04f; // 0.0001
+    u[i] = 0.2f; // 0.0001
 	}
 
   // GAUSSIANS
@@ -111,7 +111,7 @@ void simple_gaussian(float* u, int nx, int ny, float h){
 			x = i*h;
 			y = j*h;
 
-			density = (1.0f/(50.0f*2.0f*M_PI*sigma_x[l]*sigma_y[l])) * exp(-(1.0f/2.0f)*((x-mu_x[l])*(x-mu_x[l])/(sigma_x[l]*sigma_x[l]) + (y-mu_y[l])*(y-mu_y[l])/(sigma_y[l]*sigma_y[l])));
+			density = (1.0f/(20.0f*2.0f*M_PI*sigma_x[l]*sigma_y[l])) * exp(-(1.0f/2.0f)*((x-mu_x[l])*(x-mu_x[l])/(sigma_x[l]*sigma_x[l]) + (y-mu_y[l])*(y-mu_y[l])/(sigma_y[l]*sigma_y[l])));
 			if (density > u[index]){
 				u[index] = density;
 				if (density > max){

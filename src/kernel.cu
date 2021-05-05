@@ -29,10 +29,10 @@ __global__ void flux_x(float *u, float *data_3D, float *data_edge, int rho)
 		float u_p, u_q;
 	  float h = 1.0f/nx;
 
-	  float tau = 0.001f ;
+	  float tau = 0.0001f ;
 		float e = 0.01f;
 		float eta = 0.00f;
-		float G = 5.0f;
+		float G = 10.0f;
 		float beta = 0.0f;
 		if (i==0){
 			i_p = nx - 1;
@@ -63,9 +63,6 @@ __global__ void flux_x(float *u, float *data_3D, float *data_edge, int rho)
 		ct_p = data_3D[(nx*j_p + i_p)*3 + 2];
 		ct_q = data_3D[(nx*j + i)*3 + 2];
 
-		if(((nx+1)*j + i)*2 + 1 > (nx+1)*nx*2){
-			printf("i = %d, j = %d \n", i, j);
-		}
 		k_E = data_edge[((nx+1)*j + i)*2];
 		H_E = data_edge[((nx+1)*j + i)*2 + 1];
 
@@ -74,8 +71,12 @@ __global__ void flux_x(float *u, float *data_3D, float *data_edge, int rho)
 
 		M = 2.0f * u_p*u_p * u_q*u_q /(3.0f*(u_q + u_p)) + (e/6.0f)*u_q*u_q*u_p*u_p*(H_E+k_E) + (beta/2.0f)*(u_p*u_p + u_q*u_q);
 
-		theta = h*h + (tau*M*(4.0f*e + 2.0f*eta + G*e*(ct_p + ct_q) - e*(T_p + T_q)));
-		f = (M*h/(theta)) * (eta*(u_p - u_q) + (e/2.0f)*(lap_q - lap_p + 5.0f*(u_p-u_q)) + W_p-W_q + e*((G*ct_q - T_q)*u_q - (G*ct_p - T_p)*u_p));
+		theta = h*h + (2.0f*tau*M*(5.0f*e/(h*h) + eta + G*e/2.0f*(ct_p + ct_q) - e/2.0f*(T_p + T_q)));
+		f = (M*h/(theta)) * (eta*(u_p - u_q) + (e/(2.0f*h*h))*(lap_q - lap_p + 5.0f*(u_p-u_q)) + W_p-W_q + e*((G*ct_q - T_q)*u_q - (G*ct_p - T_p)*u_p));
+
+		if (f>0.001){
+			printf("stab = %f, visc = %f, gravite = %f, 3D = %f \n", eta*(u_p - u_q), (e/(2.0f*h*h))*(lap_q - lap_p + 5.0f*(u_p-u_q)),  W_p-W_q, e*((G*ct_q - T_q)*u_q - (G*ct_p - T_p)*u_p)  );
+		}
 
 		float val = tau*f/h;
 		if(u_p<val){
@@ -132,10 +133,10 @@ __global__ void flux_y(float *u, float *data_3D, float *data_edge, int rho)
 		float u_p, u_q;
 	  float h = 1.0f/nx;
 
-	  float tau = 0.001f ;
+	  float tau = 0.0001f ;
 		float e = 0.01f;
 		float eta = 0.00f;
-		float G = 5.0f;
+		float G = 10.0f;
 		float beta = 0.0f;
 		if (j==0){
 			i_p = i - di;
@@ -177,10 +178,10 @@ __global__ void flux_y(float *u, float *data_3D, float *data_edge, int rho)
 			W_p = G*(ny-j_p-0.5f)*h - H_p;
 		}
 
-		M = 2.0f * u_q*u_q * u_p*u_p /(3.0f*(u_q + u_p)) + (e/6.0f)*u_q*u_q*u_p*u_p*(H_E+k_E) + (beta/2.0f)*(u_p*u_p + u_q*u_q);
+		M = 2.0f * u_q*u_q * u_p*u_p /(3.0f*(u_q + u_p)); //+ (e/6.0f)*u_q*u_q*u_p*u_p*(H_E+k_E) + (beta/2.0f)*(u_p*u_p + u_q*u_q);
 
-		theta = h*h + (tau*M*(4.0f*e + 2.0f*eta + G*e*(ct_p + ct_q) - e*(T_p + T_q)));
-		f = (M*h/(theta)) * (eta*(u_p - u_q) + (e/2.0f)*(lap_q - lap_p + 5.0f*(u_p-u_q)) + W_p-W_q + e*((G*ct_q - T_q)*u_q - (G*ct_p - T_p)*u_p));
+		theta = h*h + (2.0f*tau*M*(5.0f*e/(h*h) + eta + G*e/2.0f*(ct_p + ct_q) - e/2.0f*(T_p + T_q)));
+		f = (M*h/(theta)) * (eta*(u_p - u_q) + (e/(2.0f*h*h))*(lap_q - lap_p + 5.0f*(u_p-u_q)) + W_p-W_q + e*((G*ct_q - T_q)*u_q - (G*ct_p - T_p)*u_p));
 
 		float val = tau*f/h;
 		if(u_p<val){
