@@ -58,7 +58,7 @@ int main(int argc, char *argv[]){
 	cudaMalloc( (void**)&u_gpu, memSize );
 
 	//init
-	initialization(u, nx, ny, h, 6);
+	initialization(u, nx, ny, h, 3);
 
 
 	cudaMemcpy( u_gpu, u, memSize, cudaMemcpyHostToDevice );
