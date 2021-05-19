@@ -115,7 +115,7 @@ __global__ void flux_y(float *u, int rho)
 	  float h = 1.0f/nx;
 
 	  float tau = 5e-4f ;
-		float e = 0.001f;
+		float e = 0.005f;
 		float eta = 0.00f;
 		float G = 5.0f;
 		float Re = 1.0f;
