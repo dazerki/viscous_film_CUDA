@@ -42,10 +42,12 @@ int main(int argc, char *argv[]){
 	int ny = 512;
 	float h = 1.0f/nx;
 	int size = nx*ny;
-
-  FILE *fpt;
-	fpt = fopen("./results/obstacle/tau-0_00001-t-3-G-5-bis.txt", "w+");
-  int counter_file = 0;
+  //
+  // FILE *fpt;
+	// fpt = fopen("./results/new/e_t_10s", "w+");
+  // FILE *fpt2;
+	// fpt2 = fopen("./results/new/e_T_0.5", "w+");
+  // int counter_file = 0;
 
 	// memory allocation
 	u = (float*)calloc(size, sizeof(float));
@@ -58,7 +60,7 @@ int main(int argc, char *argv[]){
 	cudaMalloc( (void**)&u_gpu, memSize );
 
 	//init
-	initialization(u, nx, ny, h, 6);
+	initialization(u, nx, ny, h, 3);
 
 
 	cudaMemcpy( u_gpu, u, memSize, cudaMemcpyHostToDevice );
@@ -140,7 +142,7 @@ int main(int argc, char *argv[]){
 
 	// PARAMETER
 	// float tau = 0.01f ;
-	int n_passe = 10;
+	int n_passe = 30;
 
   struct timeval start, end;
   gettimeofday(&start, NULL);
@@ -168,7 +170,7 @@ int main(int argc, char *argv[]){
 
     double delta = ((end.tv_sec  - start.tv_sec) * 1000000u +
            end.tv_usec - start.tv_usec) / 1.e6;
-    printf("Time taken: %f \n", delta);
+    // printf("Time taken: %f \n", delta);
 
 
 
@@ -195,16 +197,24 @@ int main(int argc, char *argv[]){
   	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
   			glfwSetWindowShouldClose(window, GL_TRUE);
 
-    counter_file ++;
-    if(counter_file == 3000){
-      for(int j=0; j<ny; j++){
-    		for(int i=0; i<nx; i++){
-    			fprintf(fpt, "%f ", u[nx*j + i]);
-    		}
-    		fprintf(fpt, "\n");
-    	}
-      exit(0);
-    }
+    // counter_file ++;
+    // if(counter_file == 1750 ){
+    //   for(int j=0; j<ny; j++){
+    // 		for(int i=0; i<nx; i++){
+    // 			fprintf(fpt, "%f ", u[nx*j + i]);
+    // 		}
+    // 		fprintf(fpt, "\n");
+    // 	}
+    // }
+    // if(counter_file == 500000 ){
+    //   for(int j=0; j<ny; j++){
+    // 		for(int i=0; i<nx; i++){
+    // 			fprintf(fpt2, "%f ", u[nx*j + i]);
+    // 		}
+    // 		fprintf(fpt2, "\n");
+    // 	}
+    //   exit(0);
+    // }
 
   }
 
