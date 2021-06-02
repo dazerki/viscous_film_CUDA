@@ -73,10 +73,10 @@ int main(int argc, char *argv[]){
 	cudaMalloc( (void**)&data_edge_y_gpu, 2*size_y*sizeof(float) );
 
 	//init
-	initialization(u, nx, ny, h, 5);
-	// read_txt(height_center, height_x_edge, height_y_edge, fileName, nx);
-	// init_surface_height_map(data_3D, height_center, nx, ny, h);
-	// init_height_map_edge(data_edge_x, data_edge_y, height_x_edge, height_y_edge, nx, ny, h);
+	initialization(u, nx, ny, h, 3);
+	read_txt(height_center, height_x_edge, height_y_edge, fileName, nx);
+	init_surface_height_map(data_3D, height_center, nx, ny, h);
+	init_height_map_edge(data_edge_x, data_edge_y, height_x_edge, height_y_edge, nx, ny, h);
 
 
 
@@ -218,9 +218,9 @@ int main(int argc, char *argv[]){
   			glfwSetWindowShouldClose(window, GL_TRUE);
 
     counter_file ++;
-    if(counter_file == 1000){
+    if(counter_file == 10){
     FILE *fpt;
-  	fpt = fopen("./fingering/512/G5k90.txt", "w+");
+  	fpt = fopen("./visadap/3DG5T01.txt", "w+");
       for(int j=0; j<ny; j++){
     		for(int i=0; i<nx; i++){
     			fprintf(fpt, "%f ", u[nx*j + i]);
