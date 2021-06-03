@@ -27,8 +27,8 @@ __global__ void flux_x(float *u, int rho)
 		float u_p, u_q;
 	  float h = 1.0f/nx;
 
-	  float tau = 0.0001f ;
-		float e = 0.005f;
+	  float tau = 0.001f ;
+		float e = 0.01f;
 		float eta = 0.00f;
 		float G = 5.0f;
 		if (i==0){
@@ -39,10 +39,37 @@ __global__ void flux_x(float *u, int rho)
 			j_p = j - dj;
 		}
 
-		if(i==0 || i==1 || i==nx-1 || j==0 || j==1 || j==ny-1){
-			lap_q = (u[nx*((j+nx)%nx) + ((i+1+nx)%nx)] + u[nx*((j+1+nx)%nx) + ((i+nx)%nx)] + u[nx*((j-1+nx)%nx) + ((i+nx)%nx)]);
-			lap_p = (u[nx*((j_p+nx)%nx) + (i_p-1+nx)%nx] + u[nx*((j_p+1+nx)%nx) + (i_p+nx)%nx] + u[nx*((j_p-1+nx)%nx) + (i_p+nx)%nx]);
-		} else {
+		if (i==nx-1){
+			if(j==0){
+				lap_q = (u[nx*j] + u[nx*(j+1) + i] + u[nx*(ny-1) + i]);
+				lap_p = (u[nx*j_p + (i_p-1)] + u[nx*(j_p+1) + i_p] + u[nx*(ny-1) + i_p]);
+			} else if(j==ny-1){
+				lap_q = (u[nx*j] + u [i] + u[nx*(j-1) + i]);
+				lap_p = (u[nx*j_p + (i_p-1)] + u[i_p] + u[nx*(j_p-1) + i_p]);
+			}
+			else{
+				lap_q = (u[nx*j + (0)] + u[nx*(j+1) + i] + u[nx*(j-1) + i]);
+				lap_p = (u[nx*j_p + (i_p-1)] + u[nx*(j_p+1) + i_p] + u[nx*(j_p-1) + i_p]);
+			}
+		} else if(i==1){
+			if(j==0){
+				lap_q = (u[nx*j + (i+1)] + u[nx*(j+1) + i] + u[nx*(ny-1) + i]);
+				lap_p = (u[nx*j_p + (i_p-1)] + u[nx*(j_p+1) + i_p] + u[nx*(ny-1) + i_p]);
+			} else if(j==ny-1){
+				lap_q = (u[nx*j + (i+1)] + u[nx*(0) + i] + u[nx*(j-1) + i]);
+				lap_p = (u[nx*j_p + (i_p-1)] + u[nx*(0) + i_p] + u[nx*(j_p-1) + i_p]);
+			}
+			else{
+				lap_q = (u[nx*j + (i+1)] + u[nx*(j+1) + i] + u[nx*(j-1) + i]);
+				lap_p = (u[nx*j_p + (i_p-1)] + u[nx*(j_p+1) + i_p] + u[nx*(j_p-1) + i_p]);
+			}
+		} else if (j==0){
+				lap_q = (u[nx*j + (i+1)] + u[nx*(j+1) + i] + u[nx*(ny-1) + i]);
+				lap_p = (u[nx*j_p + (nx-1)] + u[nx*(j_p+1) + i_p] + u[nx*(ny-1) + i_p]);
+		} else if (j==ny-1){
+				lap_q = (u[nx*j + (i+1)] + u [i] + u[nx*(j-1) + i]);
+				lap_p = (u[nx*j_p + (i_p-1)] + u[i_p] + u[nx*(j_p-1) + i_p]);
+		} else{
 			lap_q = (u[nx*j + (i+1)] + u[nx*(j+1) + i] + u[nx*(j-1) + i]);
 			lap_p = (u[nx*j_p + (i_p-1)] + u[nx*(j_p+1) + i_p] + u[nx*(j_p-1) + i_p]);
 		}
@@ -51,13 +78,13 @@ __global__ void flux_x(float *u, int rho)
 		u_p = u[nx*j_p + i_p];
 		u_q = u[nx*j + i];
 
-		W_q = G*(ny-j-0.5f)*h;
-		W_p = G*(ny-j_p-0.5f)*h;
+		// W_q = G*(ny-j-0.5f)*h;
+		// W_p = G*(ny-j_p-0.5f)*h;
 
 		M = 2.0f * u_p*u_p * u_q*u_q /(3.0f*(u_q + u_p));
 
-		theta = h*h + (tau*M*(10.0f*e + 2.0f*eta));
-		f = (M*h/(theta)) * (eta*(u_p - u_q) + (e)*(lap_q - lap_p + 5.0f*(u_p-u_q)) + W_p-W_q);
+		theta = h*h + (2.0f*tau*M*(5.0f*e + eta));
+		f = (M*h/(theta)) * ((eta+5.0f*e)*(u_p - u_q) + (e)*(lap_q - lap_p));
 
 		float val = tau*f/h;
 		if(u_p<val){
@@ -112,8 +139,8 @@ __global__ void flux_y(float *u, int rho)
 		float u_p, u_q;
 	  float h = 1.0f/nx;
 
-	  float tau = 0.0001f ;
-		float e = 0.005f;
+	  float tau = 0.001f ;
+		float e = 0.01f;
 		float eta = 0.00f;
 		float G = 5.0f;
 
@@ -126,10 +153,35 @@ __global__ void flux_y(float *u, int rho)
 		}
 
 
-		if(i==0 || i==1 || i==nx-1 || j==0 || j==1 || j==ny-1){
-			lap_q = (u[nx*((j+nx)%nx) + (i+1+nx)%nx] + u[nx*((j+1+nx)%nx) + (i+nx)%nx] + u[nx*((j+nx)%nx) + (i-1+nx)%nx]);
-			lap_p = (u[nx*((j_p+nx)%nx) + (i_p-1+nx)%nx] + u[nx*((j_p+nx)%nx) + (i_p+1+nx)%nx] + u[nx*((j_p-1+nx)%nx) + (i_p+nx)%nx]);
-		} else {
+		if (j==ny-1){
+			if(i==0){
+				lap_q = (u[nx*j + (i+1)] + u[nx*(0) + i] + u[nx*(j) + nx-1]);
+				lap_p = (u[nx*j_p + (nx-1)] + u[nx*(j_p) + i_p+1] + u[nx*(j_p-1) + i_p]);
+			} else if (i==nx-1){
+				lap_q = (u[nx*j + (0)] + u[nx*(0) + i] + u[nx*(j) + i-1]);
+				lap_p = (u[nx*j_p + (i_p-1)] + u[nx*(j_p) + 0] + u[nx*(j_p-1) + i_p]);
+			} else {
+				lap_q = (u[nx*j + (i+1)] + u[nx*(0) + i] + u[nx*(j) + i-1]);
+				lap_p = (u[nx*j_p + (i_p-1)] + u[nx*(j_p) + i_p+1] + u[nx*(j_p-1) + i_p]);
+			}
+		} else if (j==1){
+			if(i==0){
+				lap_q = (u[nx*j + (i+1)] + u[nx*(j+1) + i] + u[nx*(j) + nx-1]);
+				lap_p = (u[nx*j_p + (nx-1)] + u[nx*(j_p) + i_p+1] + u[nx*(ny-1) + i_p]);
+			} else if(i==nx-1){
+				lap_q = (u[nx*j + (0)] + u[nx*(j+1) + i] + u[nx*(j) + i-1]);
+				lap_p = (u[nx*j_p + (i-1)] + u[nx*(j_p) + 0] + u[nx*(ny-1) + i_p]);
+			} else {
+				lap_q = (u[nx*j + (i+1)] + u[nx*(j+1) + i] + u[nx*(j) + i-1]);
+				lap_p = (u[nx*j_p + (i-1)] + u[nx*(j_p) + i_p+1] + u[nx*(ny-1) + i_p]);
+			}
+		} else if (i==0){
+			lap_q = (u[nx*j + (i+1)] + u[nx*(j+1) + i] + u[nx*(j) + nx-1]);
+			lap_p = (u[nx*j_p + (nx-1)] + u[nx*(j_p) + i_p+1] + u[nx*(j_p-1) + i_p]);
+		} else if (i==nx-1){
+			lap_q = (u[nx*j + (0)] + u[nx*(j+1) + i] + u[nx*(j) + i-1]);
+			lap_p = (u[nx*j_p + (i_p-1)] + u[nx*(j_p) + 0] + u[nx*(j_p-1) + i_p]);
+		} else{
 			lap_q = (u[nx*j + (i+1)] + u[nx*(j+1) + i] + u[nx*(j) + i-1]);
 			lap_p = (u[nx*j_p + (i_p-1)] + u[nx*(j_p) + i_p+1] + u[nx*(j_p-1) + i_p]);
 		}
@@ -147,8 +199,8 @@ __global__ void flux_y(float *u, int rho)
 
 		M = 2.0f * u_q*u_q * u_p*u_p /(3.0f*(u_q + u_p));
 
-		theta = h*h + (tau*M*(10.0f*e + 2.0f*eta));
-		f = (M*h/(theta)) * (eta*(u_p - u_q) + (e)*(lap_q - lap_p + 5.0f*(u_p-u_q)) + W_p-W_q);
+		theta = h*h + (2.0f*tau*M*(5.0f*e + eta));
+		f = (M*h/(theta)) * ((eta+5.0f*e)*(u_p - u_q) + (e)*(lap_q - lap_p) + W_p-W_q);
 
 		float val = tau*f/h;
 		if(u_p<val){

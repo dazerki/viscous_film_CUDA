@@ -142,7 +142,7 @@ int main(int argc, char *argv[]){
 
 	// PARAMETER
 	// float tau = 0.01f ;
-	int n_passe = 5;
+	int n_passe = 40;
 
   struct timeval start, end;
   gettimeofday(&start, NULL);
@@ -197,24 +197,24 @@ int main(int argc, char *argv[]){
   	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
   			glfwSetWindowShouldClose(window, GL_TRUE);
 
-    counter_file ++;
-    if(counter_file == 35){
-      for(int j=0; j<ny; j++){
-    		for(int i=0; i<nx; i++){
-    			fprintf(fpt, "%f ", u[nx*j + i]);
-    		}
-    		fprintf(fpt, "\n");
-    	}
-    }
-    if(counter_file == 2000){
-      for(int j=0; j<ny; j++){
-    		for(int i=0; i<nx; i++){
-    			fprintf(fpt2, "%f ", u[nx*j + i]);
-    		}
-    		fprintf(fpt2, "\n");
-    	}
-      exit(0);
-    }
+    // counter_file ++;
+    // if(counter_file == 35){
+    //   for(int j=0; j<ny; j++){
+    // 		for(int i=0; i<nx; i++){
+    // 			fprintf(fpt, "%f ", u[nx*j + i]);
+    // 		}
+    // 		fprintf(fpt, "\n");
+    // 	}
+    // }
+    // if(counter_file == 2000){
+    //   for(int j=0; j<ny; j++){
+    // 		for(int i=0; i<nx; i++){
+    // 			fprintf(fpt2, "%f ", u[nx*j + i]);
+    // 		}
+    // 		fprintf(fpt2, "\n");
+    // 	}
+    //   exit(0);
+    // }
 
   }
 
