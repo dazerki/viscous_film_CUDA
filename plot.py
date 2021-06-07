@@ -312,9 +312,8 @@ y = np.linspace(0, 1, 512)
 
 
 
-with open('./build/visadap/3DG5T3.txt', 'r') as f:
+with open('./build/results/new/data.txt', 'r') as f:
     z1 = [[float(num) for num in line.split()] for line in f]
-
 
 z1 = np.array(z1)
 z1 = z1.reshape(512, 512)
@@ -322,9 +321,9 @@ z1 = z1.reshape(512, 512)
 fig = plt.imshow(z1, interpolation = 'bicubic', cmap='turbo')
 fig.axes.get_xaxis().set_visible(False)
 fig.axes.get_yaxis().set_visible(False)
-# plt.title(r'$T = 0.5 $')
-plt.savefig("../results_new/visadap/3DG5T3.pdf")
-
+# plt.title(r'$ $')
+plt.savefig("../results_new/blender_colormap.pdf")
+plt.show()
 
 
 

@@ -30,7 +30,7 @@ __global__ void flux_x(float *u, int rho)
 	  float tau = 0.001f ;
 		float e = 0.01f;
 		float eta = 0.00f;
-		float G = 5.0f;
+		float G = 13.0f;
 		if (i==0){
 			i_p = nx - 1;
 			j_p = j - dj;
@@ -142,7 +142,7 @@ __global__ void flux_y(float *u, int rho)
 	  float tau = 0.001f ;
 		float e = 0.01f;
 		float eta = 0.00f;
-		float G = 5.0f;
+		float G = 13.0f;
 
 		if (j==0){
 			i_p = i - di;

@@ -6,6 +6,8 @@
 const GLchar* vertexSource;
 const GLchar* geometrySource;
 const GLchar* fragmentSource;
+const GLchar* causticSource;
+const GLchar* refractionSource;
 
 GLuint vertexShader;
 GLuint geometryShader;
