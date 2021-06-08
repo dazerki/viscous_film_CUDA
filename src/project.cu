@@ -44,10 +44,10 @@ int main(int argc, char *argv[]){
 	int size = nx*ny;
 
   FILE *fpt;
-	fpt = fopen("./results/new/delta_t_10s.txt", "w+");
-  FILE *fpt2;
-	fpt2 = fopen("./results/new/delta_T_0.5.txt", "w+");
-  int counter_file = 0;
+	fpt = fopen("./results/video/G13_tau1e-3.txt", "w+");
+  // FILE *fpt2;
+	// fpt2 = fopen("./results/new/delta_T_0.5.txt", "w+");
+  // int counter_file = 0;
 
 	// memory allocation
 	u = (float*)calloc(size, sizeof(float));
@@ -142,14 +142,15 @@ int main(int argc, char *argv[]){
 
 	// PARAMETER
 	// float tau = 0.01f ;
-	int n_passe = 40;
+	int n_passe = 20;
 
   struct timeval start, end;
-  gettimeofday(&start, NULL);
+
 
 // gettimeofday(&start, NULL);
 	//LOOP IN TIME
   while(!glfwWindowShouldClose(window)) {
+    gettimeofday(&start, NULL);
   	for(int p=0; p<n_passe; p++){
   		for(int rho=0; rho<4; rho++){
   			flux_x<<<Nblocks, Nthreads>>>(u_gpu, rho);
@@ -159,18 +160,18 @@ int main(int argc, char *argv[]){
   			flux_y<<<Nblocks, Nthreads>>>(u_gpu, rho);
   		}
 
-      // glfwPollEvents();
-  		// if(drag){
-      //   cudaMemcpy( u, u_gpu, size*sizeof(float), cudaMemcpyDeviceToHost );
-  		// 	add_fluid(window);
-      //   cudaMemcpy( u_gpu, u, memSize, cudaMemcpyHostToDevice );
-  		// }
+      glfwPollEvents();
+  		if(drag){
+        cudaMemcpy( u, u_gpu, size*sizeof(float), cudaMemcpyDeviceToHost );
+  			add_fluid(window);
+        cudaMemcpy( u_gpu, u, memSize, cudaMemcpyHostToDevice );
+  		}
   	}
     gettimeofday(&end, NULL);
 
     double delta = ((end.tv_sec  - start.tv_sec) * 1000000u +
            end.tv_usec - start.tv_usec) / 1.e6;
-    // printf("Time taken: %f \n", delta);
+    printf("Time taken: %f \n", delta);
 
 
 
@@ -198,15 +199,15 @@ int main(int argc, char *argv[]){
   			glfwSetWindowShouldClose(window, GL_TRUE);
 
     // counter_file ++;
-    // if(counter_file == 35){
-    //   for(int j=0; j<ny; j++){
-    // 		for(int i=0; i<nx; i++){
-    // 			fprintf(fpt, "%f ", u[nx*j + i]);
-    // 		}
-    // 		fprintf(fpt, "\n");
-    // 	}
+    // if(counter_file == 1750){
+      for(int j=0; j<ny; j++){
+    		for(int i=0; i<nx; i++){
+    			fprintf(fpt, "%f ", u[nx*j + i]);
+    		}
+    		fprintf(fpt, "\n");
+    	}
     // }
-    // if(counter_file == 2000){
+    // if(counter_file == 100000){
     //   for(int j=0; j<ny; j++){
     // 		for(int i=0; i<nx; i++){
     // 			fprintf(fpt2, "%f ", u[nx*j + i]);
