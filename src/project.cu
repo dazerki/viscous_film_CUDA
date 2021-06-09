@@ -44,7 +44,7 @@ int main(int argc, char *argv[]){
 	int size = nx*ny;
   //
   // FILE *fpt;
-	// fpt = fopen("./results/new/e_t_10s", "w+");
+	// fpt = fopen("./results/video/G13", "w+");
   // FILE *fpt2;
 	// fpt2 = fopen("./results/new/e_T_0.5", "w+");
   // int counter_file = 0;
@@ -60,7 +60,7 @@ int main(int argc, char *argv[]){
 	cudaMalloc( (void**)&u_gpu, memSize );
 
 	//init
-	initialization(u, nx, ny, h, 3);
+	initialization(u, nx, ny, h, 4);
 
 
 	cudaMemcpy( u_gpu, u, memSize, cudaMemcpyHostToDevice );
@@ -142,7 +142,7 @@ int main(int argc, char *argv[]){
 
 	// PARAMETER
 	// float tau = 0.01f ;
-	int n_passe = 30;
+	int n_passe = 10;
 
   struct timeval start, end;
   gettimeofday(&start, NULL);
@@ -199,12 +199,12 @@ int main(int argc, char *argv[]){
 
     // counter_file ++;
     // if(counter_file == 1750 ){
-    //   for(int j=0; j<ny; j++){
-    // 		for(int i=0; i<nx; i++){
-    // 			fprintf(fpt, "%f ", u[nx*j + i]);
-    // 		}
-    // 		fprintf(fpt, "\n");
-    // 	}
+      // for(int j=0; j<ny; j++){
+    	// 	for(int i=0; i<nx; i++){
+    	// 		fprintf(fpt, "%f ", u[nx*j + i]);
+    	// 	}
+    	// 	fprintf(fpt, "\n");
+    	// }
     // }
     // if(counter_file == 500000 ){
     //   for(int j=0; j<ny; j++){

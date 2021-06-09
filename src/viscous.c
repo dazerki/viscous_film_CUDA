@@ -6,7 +6,7 @@
 void initialization(float* u, int nx, int ny,  float h, int choice){
 
   for(int i=0; i<nx*ny; i++){
-    u[i] = 0.2f;
+    u[i] = 0.04f;
 	}
 
   // GAUSSIANS
@@ -96,7 +96,7 @@ void circle(float* u, int nx, int ny, float value){
 
 void float_circle(float* u, int nx, int ny, float value){
   for(int i=0; i<nx*ny; i++){
-    if((((i/nx - 200)*(i/nx - 200) + (i%nx -170)*(i%nx - 170) < 75*75) && i/nx > 225) || (((i/nx - 200)*(i/nx - 200) + (i%nx -342)*(i%nx - 342) < 75*75) && i/nx > 225)){
+    if((((i/nx - 250)*(i/nx - 250) + (i%nx -170)*(i%nx - 170) < 75*75) && i/nx < 225) || (((i/nx - 250)*(i/nx - 250) + (i%nx -342)*(i%nx - 342) < 75*75) && i/nx < 225)){
 			u[i] = value;
 		}
   }
@@ -104,7 +104,7 @@ void float_circle(float* u, int nx, int ny, float value){
 
 void simple_gaussian(float* u, int nx, int ny, float h){
   float mu_x[1] = {0.5f};
-	float mu_y[1] = {0.33f};
+	float mu_y[1] = {0.2f};
 	float sigma_x[1] = {0.1f};
 	float sigma_y[1] = {0.07f};
 	float density, x, y;

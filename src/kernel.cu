@@ -27,7 +27,7 @@ __global__ void flux_x(float *u, int rho)
 		float u_p, u_q;
 	  float h = 1.0f/nx;
 
-	  float tau = 0.5e-4f ;
+	  float tau = 2e-4f ;
 		float e = 0.005f;
 		float eta = 0.00f;
 		float G = 5.0f;
@@ -56,8 +56,8 @@ __global__ void flux_x(float *u, int rho)
 
 		M = 2.0f * u_p*u_p * u_q*u_q /(3.0f*(u_q + u_p));
 
-		theta = h*h + (2.0f*tau*M*(5.0f*e*e*e/(h*h) + eta));
-		f = (M*h/(theta)) * (eta*(u_p - u_q) + (e*e*e/(h*h))*(lap_q - lap_p + 5.0f*(u_p-u_q)) + W_p-W_q);
+		theta = h*h + (2.0f*tau*M*(5.0f*e + eta));
+		f = (M*h/(theta)) * (eta*(u_p - u_q) + (e)*(lap_q - lap_p + 5.0f*(u_p-u_q)) + W_p-W_q);
 
 		float val = tau*f/h;
 		if(u_p<val){
@@ -112,7 +112,7 @@ __global__ void flux_y(float *u, int rho)
 		float u_p, u_q;
 	  float h = 1.0f/nx;
 
-	  float tau = 0.5e-4f ;
+	  float tau = 2e-4f ;
 		float e = 0.005f;
 		float eta = 0.00f;
 		float G = 5.0f;
@@ -147,8 +147,8 @@ __global__ void flux_y(float *u, int rho)
 
 		M = 2.0f * u_q*u_q * u_p*u_p /(3.0f*(u_q + u_p));
 
-		theta = h*h + (tau*M*(10.0f*e*e*e/(h*h) + 2.0f*eta));
-		f = (M*h/(theta)) * (eta*(u_p - u_q) + (e*e*e/(h*h))*(lap_q - lap_p + 5.0f*(u_p-u_q)) + W_p-W_q);
+		theta = h*h + (tau*M*(10.0f*e + 2.0f*eta));
+		f = (M*h/(theta)) * (eta*(u_p - u_q) + (e)*(lap_q - lap_p + 5.0f*(u_p-u_q)) + W_p-W_q);
 
 		float val = tau*f/h;
 		if(u_p<val){
