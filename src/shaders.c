@@ -72,7 +72,7 @@ void init_shaders() {
         }
 
         void main() {
-            color = turbo(fs_in.color);
+            color = vec4(fs_in.color, fs_in.color, fs_in.color, 1.0);
         }
     )glsl";
 
@@ -80,6 +80,8 @@ void init_shaders() {
     refractionSource = R"glsl(
           #version 300 es
           precision highp float;
+
+          layout (local_size_x = 1, local_size_y = 1) in;
           uniform sampler2D u;
           uniform sampler2D normals;
           uniform sampler2D groundTexture;
@@ -87,7 +89,7 @@ void init_shaders() {
           uniform sampler2D caustics2;
           uniform sampler2D caustics3;
           uniform sampler2D caustics4;
-          in vec2 p;
+
           out vec4 fragColor;
 
           // Light ray direction
@@ -108,8 +110,8 @@ void init_shaders() {
           vec2 getGroundIntersection(vec2 fluidIncidentPoint)
           {
             vec2 p = fluidIncidentPoint;
-            vec2 h = vec2(1.,1.) / vec2(textureSize(u, 0));
-            ivec2 ij = ivec2(p * vec2(textureSize(u, 0)));
+            vec2 h = vec2(1.,1.) / vec2(512., 512.);
+            ivec2 ij = vec2(gl_GlobalInvocationID.xy);
 
             // Surface normal
             vec3 N = texture(normals, p).rgb;
@@ -136,7 +138,10 @@ void init_shaders() {
 
           void main()
           {
-            vec2 h = vec2(1.,1.) / vec2(textureSize(u, 0));
+            vec2 ij = vec2(gl_GlobalInvocationID.xy);
+            vec2 p = ij / vec2(512., 512.);
+
+            vec2 h = vec2(1.,1.) / vec2(512., 512.);
             vec2 groundPoint = getGroundIntersection(p);
             float illumination = 0.;
             illumination += texture(caustics1, p + vec2(0, -6) * h).r;
@@ -174,11 +179,13 @@ void init_shaders() {
           precision highp float;
           uniform sampler2D u;
           uniform sampler2D normals;
-          in vec2 p;
-          layout(location=0) out vec4 out1;
-          layout(location=1) out vec4 out2;
-          layout(location=2) out vec4 out3;
-          layout(location=3) out vec4 out4;
+
+          layout (local_size_x = 1, local_size_y = 1) in;
+          uniform image2D caustics1;
+          uniform image2D caustics2;
+          uniform image2D caustics3;
+          uniform image2D caustics4;
+
 
           // Light ray direction
           const vec3 L = vec3(0.09901475,  0.09901475, -0.99014754);
@@ -212,7 +219,7 @@ void init_shaders() {
           // refracted.
           vec2 getGroundIntersection(vec2 waterIncidentPoint)
           {
-            vec2 h = vec2(1.,1.) / vec2(textureSize(u, 0));
+            vec2 h = vec2(1.,1.) / vec2(512., 512.);
 
             // Surface normal
             vec3 n = texture(normals, waterIncidentPoint).rgb;
@@ -227,8 +234,10 @@ void init_shaders() {
 
           void main()
           {
-              vec2 h = vec2(1.,1.) / vec2(textureSize(u, 0));
-              ivec2 ij = ivec2(p * vec2(textureSize(u, 0)));
+              ivec2 ij = ivec2(gl_GlobalInvocationID.xy);
+              vec2 p = ij/vec2(512., 512.);
+              vec2 h = vec2(1.,1.) / vec2(512., 512.);
+              // ivec2 ij = ivec2(p * vec2(textureSize(u, 0)));
               // initialize output intensities
               float intensity[N];
               for ( int i=0; i<N; i++ ) intensity[i] = 0.;
@@ -257,10 +266,10 @@ void init_shaders() {
                   }
               }
               // copy the output intensities to the color channels
-              out1 = vec4( intensity[0], intensity[1], intensity[2], intensity[3] );
-              out2 = vec4( intensity[4], intensity[5], intensity[6], intensity[7] );
-              out3 = vec4( intensity[8], intensity[9], intensity[10], intensity[11] );
-              out4 = vec4( intensity[12], 0., 0., 0. );
+              imageStore(caustics1, ij, vec4( intensity[0], intensity[1], intensity[2], intensity[3] ) );
+              imageStore(caustics2, ij, vec4( intensity[4], intensity[5], intensity[6], intensity[7] ) );
+              imageStore(caustics3, ij, vec4( intensity[8], intensity[9], intensity[10], intensity[11] ) );
+              imageStore(caustics4, ij, vec4( intensity[12], 0., 0., 0.) );
           }
     )glsl";
 
@@ -286,7 +295,26 @@ void init_shaders() {
     glAttachShader(shaderProgram, fragmentShader);
     glBindFragDataLocation(shaderProgram, 0, "color");
     glLinkProgram(shaderProgram);
-    glUseProgram(shaderProgram);
+
+
+    // Create and compile the caustic shader
+    causticShader = glCreateShader(GL_COMPUTE_SHADER);
+    glShaderSource(causticShader, 1, &causticSource, NULL);
+    glCompileShader(causticShader);
+
+    causticProgram = glCreateProgram();
+    glAttachShader(causticProgram, causticShader);
+    glLinkProgram(causticProgram);
+
+    // Create and compile the refraction shader
+    refractionShader = glCreateShader(GL_COMPUTE_SHADER);
+    glShaderSource(refractionShader, 1, &refractionSource, NULL);
+    glCompileShader(refractionShader);
+
+    refractionProgram = glCreateProgram();
+    glAttachShader(refractionProgram, refractionShader);
+    glLinkProgram(refractionProgram);
+
 }
 
 void free_shaders() {

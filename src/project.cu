@@ -43,11 +43,11 @@ int main(int argc, char *argv[]){
 	float h = 1.0f/nx ;
 	int size = nx*ny;
 
-  FILE *fpt;
-	fpt = fopen("./results/new/data.txt", "w+");
+  // FILE *fpt;
+	// fpt = fopen("./results/new/data.txt", "w+");
   // FILE *fpt2;
 	// fpt2 = fopen("./results/new/delta_T_0.5.txt", "w+");
-  int counter_file = 0;
+  // int counter_file = 0;
 
 	// memory allocation
 	u = (float*)calloc(size, sizeof(float));
@@ -183,6 +183,15 @@ int main(int argc, char *argv[]){
   	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
   	glClear(GL_COLOR_BUFFER_BIT);
 
+    //compute caustic
+    glUseProgram(causticProgram);
+    glUniform1f(glGetUniformLocation(causticProgram, "normals"), (float) 0.0f);
+    glUniform1f(glGetUniformLocation(causticProgram, "u"), (float) 0.0f);
+    glDispatchCompute(512, 512, 1); // 512^2 threads in blocks of 16^2
+    // checkErrors("Dispatch compute shader");
+
+    //compute refraction
+
   	for (int i = 0; i < nx*nx; i++) {
   			colors[i] = (float) (u[i]);
   	}
@@ -191,22 +200,24 @@ int main(int argc, char *argv[]){
   	glBufferData(GL_ARRAY_BUFFER, nx*nx*sizeof(GLfloat), colors, GL_STREAM_DRAW);
 
 
+
   	// Draw elements
+    glUseProgram(shaderProgram);
   	glDrawElements(GL_LINES_ADJACENCY, 4*(nx-1)*(nx-1), GL_UNSIGNED_INT, 0);
 
   	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
   			glfwSetWindowShouldClose(window, GL_TRUE);
 
-    counter_file ++;
-    if(counter_file == 110){
-      for(int j=0; j<ny; j++){
-    		for(int i=0; i<nx; i++){
-    			fprintf(fpt, "%f ", u[nx*j + i]);
-    		}
-    		fprintf(fpt, "\n");
-    	}
-      exit(0);
-    }
+    // counter_file ++;
+    // if(counter_file == 110){
+    //   for(int j=0; j<ny; j++){
+    // 		for(int i=0; i<nx; i++){
+    // 			fprintf(fpt, "%f ", u[nx*j + i]);
+    // 		}
+    // 		fprintf(fpt, "\n");
+    // 	}
+    //   exit(0);
+    // }
     // if(counter_file == 50){
     //   for(int j=0; j<ny; j++){
     // 		for(int i=0; i<nx; i++){
