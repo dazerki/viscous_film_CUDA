@@ -48,7 +48,7 @@ int main(int argc, char *argv[]){
 
   // FILE *fpt;
 	// fpt = fopen("tau-0_001-t-3-G-5-obstacle2.txt", "w+");
-  int counter_file = 0;
+  // int counter_file = 0;
 
 	// memory allocation
 	u = (float*)calloc(size, sizeof(float));
@@ -217,18 +217,18 @@ int main(int argc, char *argv[]){
   	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
   			glfwSetWindowShouldClose(window, GL_TRUE);
 
-    counter_file ++;
-    if(counter_file == 10){
-    FILE *fpt;
-  	fpt = fopen("./visadap/3DG5T01.txt", "w+");
-      for(int j=0; j<ny; j++){
-    		for(int i=0; i<nx; i++){
-    			fprintf(fpt, "%f ", u[nx*j + i]);
-    		}
-    		fprintf(fpt, "\n");
-    	}
-      exit(0);
-    }
+    // counter_file ++;
+    // if(counter_file == 10){
+    // FILE *fpt;
+  	// fpt = fopen("./visadap/3DG5T01.txt", "w+");
+    //   for(int j=0; j<ny; j++){
+    // 		for(int i=0; i<nx; i++){
+    // 			fprintf(fpt, "%f ", u[nx*j + i]);
+    // 		}
+    // 		fprintf(fpt, "\n");
+    // 	}
+    //   exit(0);
+    // }
     // getchar();
 
   }

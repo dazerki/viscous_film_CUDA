@@ -201,6 +201,15 @@ CMAKE_STRIP:FILEPATH=/usr/bin/strip
 // Studio IDE projects all commands are done without /nologo.
 CMAKE_VERBOSE_MAKEFILE:BOOL=FALSE
 
+//Temporal Discretisation to use.
+DELTA_T:BOOL=0.001
+
+//epsilon to use.
+EPSILON:BOOL=OFF
+
+//Stabilisation factor to use.
+ETA:BOOL=OFF
+
 //The directory containing a CMake configuration file for GLEW.
 GLEW_DIR:PATH=GLEW_DIR-NOTFOUND
 
@@ -224,6 +233,9 @@ GLFW3_INCLUDE_DIR:PATH=/usr/include
 
 //Path to a library.
 GLFW3_LIBRARY:FILEPATH=/usr/lib/x86_64-linux-gnu/libglfw.so
+
+//Discretisation grid to use.
+N_DISCR:BOOL=1024
 
 //Path to a file.
 OPENGL_EGL_INCLUDE_DIR:PATH=/usr/include
@@ -275,6 +287,9 @@ Project_BINARY_DIR:STATIC=/home/antoine/Documents/Viscous/GPU/build
 
 //Value Computed by CMake
 Project_SOURCE_DIR:STATIC=/home/antoine/Documents/Viscous/GPU
+
+//Bond number to use.
+ZETA:BOOL=OFF
 
 
 ########################

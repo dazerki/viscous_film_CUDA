@@ -156,7 +156,6 @@ project: CMakeFiles/project.dir/src/window.c.o
 project: CMakeFiles/project.dir/src/kernel.cu.o
 project: CMakeFiles/project.dir/src/project.cu.o
 project: CMakeFiles/project.dir/build.make
-project: /usr/lib/x86_64-linux-gnu/libpython3.8.so
 project: /usr/lib/x86_64-linux-gnu/libGLEW.so
 project: /usr/lib/x86_64-linux-gnu/libglfw.so
 project: /usr/lib/x86_64-linux-gnu/libOpenGL.so

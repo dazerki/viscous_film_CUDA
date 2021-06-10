@@ -6,14 +6,9 @@ project(Project LANGUAGES C CUDA)
 # Exec name
 set(EXEC_NAME project)
 set(CMAKE_C_FLAGS "-O3")
-set(CMAKE_CUDA_FLAGS "-lineinfo")
 
 # CMake module
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/")
-
-# Python
-find_package(PythonLibs REQUIRED)
-include_directories(${PYTHON_INCLUDE_DIRS})
 
 # OpenMP
 find_package(OpenMP REQUIRED)
@@ -40,8 +35,44 @@ file(GLOB C_SRCS
 file(GLOB CUDA_SRCS
     "${PROJECT_SOURCE_DIR}/src/*.cu"
 )
+
+# Compile options
+option(EPSILON "epsilon to use." OFF)
+option(ZETA "Bond number to use." OFF)
+option(DELTA_T "Temporal Discretisation to use." OFF)
+option(ETA "Stabilisation factor to use." OFF)
+
+# Epsilon
+if (NOT EPSILON)
+    set(EPSILON 0.01f)
+endif (NOT EPSILON)
+message(STATUS "Using epsilon = ${EPSILON} .")
+add_definitions(-DEPSILON=${EPSILON})
+
+# zeta
+if (NOT ZETA)
+    set(ZETA 5.0f)
+endif (NOT ZETA)
+message(STATUS "Using Bond number = ${ZETA} .")
+add_definitions(-DZETA=${ZETA})
+
+# DELTA_T
+if (NOT DELTA_T)
+    set(DELTA_T 0.0005f)
+endif (NOT DELTA_T)
+message(STATUS "Using dt = ${DELTA_T} .")
+add_definitions(-DDELTA_T=${DELTA_T})
+
+# zeta
+if (NOT ETA)
+    set(ETA 0.0f)
+endif (NOT ETA)
+message(STATUS "Using stab coeff = ${ETA} .")
+add_definitions(-DETA=${ETA})
+
+
+
 # Use Gcc for compiling/linking the source files
 add_executable(${EXEC_NAME} ${C_SRCS} ${CUDA_SRCS})
 target_link_libraries(${EXEC_NAME} ${PYTHON_LIBRARIES} ${OPENMP_C_LIBRARIES} ${GLEW_LIBRARIES} ${GLFW3_LIBRARY} ${OPENGL_LIBRARY} pthread m)
 set_property(TARGET ${EXEC_NAME} PROPERTY CUDA_ARCHITECTURES 70-real 72-virtual)
-set_property(TARGET ${EXEC_NAME} PROPERTY CUDA_FLAG lineinfo)
