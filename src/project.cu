@@ -1,7 +1,5 @@
 
 extern "C" {
-  #include "window.h"
-  #include "shaders.h"
   #include "viscous.h"
 }
 
@@ -19,39 +17,151 @@ extern "C" {
 #include <sys/time.h>
 #include <cuda.h>
 
+// compute shaders tutorial
+// Dr Anton Gerdelan <gerdela@scss.tcd.ie>
+// Trinity College Dublin, Ireland
+// 26 Feb 2016. latest v 2 Mar 2016
+
+#include "gl_utils.h"
+
+// this is the compute shader in an ugly C string
+const char* compute_shader_str =
+  "#version 430\n                                                             \
+layout (local_size_x = 1, local_size_y = 1) in;\n                             \
+layout (rgba32f, binding = 0) uniform image2D img_output;\n                   \
+\n                                                                            \
+void main () {\n                                                              \
+  vec4 pixel = vec4 (0.0, 0.0, 0.0, 1.0);\n                                   \
+  ivec2 pixel_coords = ivec2 (gl_GlobalInvocationID.xy);\n                    \
+\n                                                                            \
+float max_x = 5.0;\n                                                          \
+float max_y = 5.0;\n                                                          \
+ivec2 dims = imageSize (img_output);\n                                        \
+float x = (float(pixel_coords.x * 2 - dims.x) / dims.x);\n                    \
+float y = (float(pixel_coords.y * 2 - dims.y) / dims.y);\n                    \
+vec3 ray_o = vec3 (x * max_x, y * max_y, 0.0);\n                              \
+vec3 ray_d = vec3 (0.0, 0.0, -1.0);                                           \
+\n                                                                            \
+vec3 sphere_c = vec3 (0.0, 0.0, -10.0);                                       \
+float sphere_r = 1.0;                                                         \
+\n                                                                            \
+vec3 omc = ray_o - sphere_c;\n                                                \
+float b = dot (ray_d, omc);\n                                                 \
+float c = dot (omc, omc) - sphere_r * sphere_r;\n                             \
+float bsqmc = b * b - c;\n                                                    \
+float t = 10000.0;\n                                                          \
+if (bsqmc >= 0.0) {\n                                                         \
+  pixel = vec4 (0.4, 0.4, 1.0, 1.0);\n                                        \
+}\n                                                                           \
+\n                                                                            \
+  // imageStore (img_output, pixel_coords, pixel);\n                             \
+}\n";
+
+const char* compute_shader_str2 =
+  "#version 430\n                                                             \
+layout (local_size_x = 1, local_size_y = 1) in;\n                             \
+layout (rgba32f, binding = 0) uniform image2D img_input;\n                    \
+layout (rgba32f, binding = 1) uniform image2D img_output;\n                   \
+\n                                                                            \
+void main () {\n                                                              \
+  ivec2 pixel_coords = ivec2 (gl_GlobalInvocationID.xy);\n                    \
+  vec4 pixel = imageLoad(img_input, pixel_coords);\n                          \
+  \n                                                                          \
+  imageStore (img_output, pixel_coords, pixel);\n                             \
+}\n";
 
 
-#define GRID_SIZE 512
-#define BLOCK_SIZE 16
+int main() {
+  ( start_gl() ); // just starts a 4.3 GL context+window
 
-int parity(int di, int dj, int i, int j, int rho);
+  // set up shaders and geometry for full-screen quad
+  // moved code to gl_utils.cpp
+  GLuint quad_vao     = create_quad_vao();
+  GLuint quad_program = create_quad_program();
 
-#define gpuErrchk(ans) { gpuAssert((ans), __FILE__, __LINE__); }
-inline void gpuAssert(cudaError_t code, const char *file, int line, bool abort=true)
-{
-   if (code != cudaSuccess)
-   {
-      fprintf(stderr,"GPUassert: %s %s %d\n", cudaGetErrorString(code), file, line);
-      if (abort) exit(code);
-   }
-}
+  GLuint ray_program = 0;
+  { // create the compute shader
+    GLuint ray_shader = glCreateShader( GL_COMPUTE_SHADER );
+    glShaderSource( ray_shader, 1, &compute_shader_str, NULL );
+    glCompileShader( ray_shader );
+    ( check_shader_errors( ray_shader ) ); // code moved to gl_utils.cpp
+    ray_program = glCreateProgram();
+    glAttachShader( ray_program, ray_shader );
+    glLinkProgram( ray_program );
+    ( check_program_errors( ray_program ) ); // code moved to gl_utils.cpp
+  }
 
-int main(int argc, char *argv[]){
+  GLuint ray_program2 = 0;
+  { // create the compute shader
+    GLuint ray_shader2 = glCreateShader( GL_COMPUTE_SHADER );
+    glShaderSource( ray_shader2, 1, &compute_shader_str2, NULL );
+    glCompileShader( ray_shader2 );
+    ( check_shader_errors( ray_shader2 ) ); // code moved to gl_utils.cpp
+    ray_program2 = glCreateProgram();
+    glAttachShader( ray_program2, ray_shader2 );
+    glLinkProgram( ray_program2 );
+    ( check_program_errors( ray_program2 ) ); // code moved to gl_utils.cpp
+  }
 
-	int nx = 512;
+  // texture handle and dimensions
+  GLuint tex_output = 0;
+  int tex_w = 512, tex_h = 512;
+  { // create the texture
+    glGenTextures( 1, &tex_output );
+    glActiveTexture( GL_TEXTURE0 );
+    glBindTexture( GL_TEXTURE_2D, tex_output );
+    glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE );
+    glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE );
+    // linear allows us to scale the window up retaining reasonable quality
+    glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
+    glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
+    // same internal format as compute shader input
+    glTexImage2D( GL_TEXTURE_2D, 0, GL_RGBA32F, tex_w, tex_h, 0, GL_RGBA, GL_FLOAT, NULL );
+    // bind to image unit so can write to specific pixels from the shader
+    glBindImageTexture( 0, tex_output, 0, GL_FALSE, 0, GL_WRITE_ONLY, GL_RGBA32F );
+  }
+
+  // texture handle and dimensions
+  GLuint tex_output2 = 0;
+  { // create the texture
+    glGenTextures( 1, &tex_output2 );
+    glActiveTexture( GL_TEXTURE1 );
+    glBindTexture( GL_TEXTURE_2D, tex_output2 );
+    glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE );
+    glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE );
+    // linear allows us to scale the window up retaining reasonable quality
+    glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
+    glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
+    // same internal format as compute shader input
+    glTexImage2D( GL_TEXTURE_2D, 0, GL_RGBA32F, tex_w, tex_h, 0, GL_RGBA, GL_FLOAT, NULL );
+    // bind to image unit so can write to specific pixels from the shader
+    glBindImageTexture( 1, tex_output2, 0, GL_FALSE, 0, GL_WRITE_ONLY, GL_RGBA32F );
+  }
+
+  { // query up the workgroups
+    int work_grp_size[3], work_grp_inv;
+    // maximum global work group (total work in a dispatch)
+    glGetIntegeri_v( GL_MAX_COMPUTE_WORK_GROUP_COUNT, 0, &work_grp_size[0] );
+    glGetIntegeri_v( GL_MAX_COMPUTE_WORK_GROUP_COUNT, 1, &work_grp_size[1] );
+    glGetIntegeri_v( GL_MAX_COMPUTE_WORK_GROUP_COUNT, 2, &work_grp_size[2] );
+    printf( "max global (total) work group size x:%i y:%i z:%i\n", work_grp_size[0], work_grp_size[1], work_grp_size[2] );
+    // maximum local work group (one shader's slice)
+    glGetIntegeri_v( GL_MAX_COMPUTE_WORK_GROUP_SIZE, 0, &work_grp_size[0] );
+    glGetIntegeri_v( GL_MAX_COMPUTE_WORK_GROUP_SIZE, 1, &work_grp_size[1] );
+    glGetIntegeri_v( GL_MAX_COMPUTE_WORK_GROUP_SIZE, 2, &work_grp_size[2] );
+    printf( "max local (in one shader) work group sizes x:%i y:%i z:%i\n", work_grp_size[0], work_grp_size[1], work_grp_size[2] );
+    // maximum compute shader invocations (x * y * z)
+    glGetIntegerv( GL_MAX_COMPUTE_WORK_GROUP_INVOCATIONS, &work_grp_inv );
+    printf( "max computer shader invocations %i\n", work_grp_inv );
+  }
+
+  int nx = 512;
 	int ny = 512;
 	float h = 1.0f/nx ;
 	int size = nx*ny;
 
-  // FILE *fpt;
-	// fpt = fopen("./results/new/data.txt", "w+");
-  // FILE *fpt2;
-	// fpt2 = fopen("./results/new/delta_T_0.5.txt", "w+");
-  // int counter_file = 0;
-
-	// memory allocation
-	u = (float*)calloc(size, sizeof(float));
-
+  float* u = (float*)calloc(size, sizeof(float));
+  float* colors_rgba = (float*)calloc(4*size, sizeof(float));
 
 	float *u_gpu;
 
@@ -68,89 +178,10 @@ int main(int argc, char *argv[]){
   int Nblocks = (nx*nx + 255)/256;
   int Nthreads = 256;
 
-  // Initialise window
-  GLFWwindow *window = init_window();
-
-  // Initialise shaders
-  init_shaders();
-
-  // Create Vertex Array Object
-  GLuint vao;
-  glGenVertexArrays(1, &vao);
-  glBindVertexArray(vao);
-
-  // Create a Vertex Buffer Object for positions
-  GLuint vbo_pos;
-  glGenBuffers(1, &vbo_pos);
-
-  GLfloat *positions = (GLfloat*) malloc(2*nx*nx*sizeof(GLfloat));
-  for (int i = 0; i < nx; i++) {
-      for (int j = 0; j < nx; j++) {
-          int ind = j*nx+i;
-          positions[2*ind  ] = (float)(1.0 - 2.0*i/(nx-1));
-          positions[2*ind+1] = (float)(1.0 - 2.0*j/(nx-1));
-      }
-  }
-
-  glBindBuffer(GL_ARRAY_BUFFER, vbo_pos);
-  glBufferData(GL_ARRAY_BUFFER, 2*nx*nx*sizeof(GLfloat), positions, GL_STATIC_DRAW);
-
-  // Specify vbo_pos' layout
-  GLint posAttrib = glGetAttribLocation(shaderProgram, "position");
-  glEnableVertexAttribArray(posAttrib);
-  glVertexAttribPointer(posAttrib, 2, GL_FLOAT, GL_FALSE, 0, (void*)0);
-
-  // Create an Element Buffer Object and copy the element data to it
-  GLuint ebo;
-  glGenBuffers(1, &ebo);
-
-	GLuint *elements = (GLuint*) malloc(4*(nx-1)*(nx-1)*sizeof(GLuint));
-  for (int i = 0; i < nx-1; i++) {
-      for (int j = 0; j < nx-1; j++) {
-          int ind  = i*nx+j;
-          int ind_ = i*(nx-1)+j;
-
-          elements[4*ind_  ] = ind;
-          elements[4*ind_+1] = ind+1;
-          elements[4*ind_+2] = ind+nx;
-          elements[4*ind_+3] = ind+nx+1;
-      }
-  }
-
-  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
-  glBufferData(GL_ELEMENT_ARRAY_BUFFER, 4*(nx-1)*(nx-1)*sizeof(GLuint), elements, GL_STATIC_DRAW);
-
-	// Create a Vertex Buffer Object for colors
-  GLuint vbo_colors;
-  glGenBuffers(1, &vbo_colors);
-
-  GLfloat *colors = (GLfloat*) malloc(nx*nx*sizeof(GLfloat));
-  for (int i = 0; i < nx; i++) {
-      for (int j = 0; j < nx; j++) {
-          int ind = i*nx+j;
-          colors[ind] = (float) u[ind];
-      }
-  }
-
-  glBindBuffer(GL_ARRAY_BUFFER, vbo_colors);
-  glBufferData(GL_ARRAY_BUFFER, nx*nx*sizeof(GLfloat), colors, GL_STREAM_DRAW);
-
-  // Specify vbo_color's layout
-  GLint colAttrib = glGetAttribLocation(shaderProgram, "color");
-  glEnableVertexAttribArray(colAttrib);
-  glVertexAttribPointer(colAttrib, 1, GL_FLOAT, GL_FALSE, 0, (void*)0);
-
-	// PARAMETER
-	// float tau = 0.01f ;
 	int n_passe = 10;
 
-  struct timeval start, end;
-  gettimeofday(&start, NULL);
-
-// gettimeofday(&start, NULL);
-	//LOOP IN TIME
-  while(!glfwWindowShouldClose(window)) {
-  	for(int p=0; p<n_passe; p++){
+  while ( !glfwWindowShouldClose( window ) ) { // drawing loop
+    for(int p=0; p<n_passe; p++){
   		for(int rho=0; rho<4; rho++){
   			flux_x<<<Nblocks, Nthreads>>>(u_gpu, rho);
   		}
@@ -166,88 +197,53 @@ int main(int argc, char *argv[]){
       //   cudaMemcpy( u_gpu, u, memSize, cudaMemcpyHostToDevice );
   		// }
   	}
-    gettimeofday(&end, NULL);
-
-    double delta = ((end.tv_sec  - start.tv_sec) * 1000000u +
-           end.tv_usec - start.tv_usec) / 1.e6;
-    // printf("Time taken: %f \n", delta);
-
-
 
   	cudaMemcpy( u, u_gpu, size*sizeof(float), cudaMemcpyDeviceToHost );
 
-    glfwSwapBuffers(window);
-  	glfwPollEvents();
-
-  	// Clear the screen to black
-  	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
-  	glClear(GL_COLOR_BUFFER_BIT);
-
-    //compute caustic
-    glUseProgram(causticProgram);
-    glUniform1f(glGetUniformLocation(causticProgram, "normals"), (float) 0.0f);
-    glUniform1f(glGetUniformLocation(causticProgram, "u"), (float) 0.0f);
-    glDispatchCompute(512, 512, 1); // 512^2 threads in blocks of 16^2
-    // checkErrors("Dispatch compute shader");
-
-    //compute refraction
-
-  	for (int i = 0; i < nx*nx; i++) {
-  			colors[i] = (float) (u[i]);
-  	}
-
-  	glBindBuffer(GL_ARRAY_BUFFER, vbo_colors);
-  	glBufferData(GL_ARRAY_BUFFER, nx*nx*sizeof(GLfloat), colors, GL_STREAM_DRAW);
+    for(int i=0; i<nx*ny; i++){
+      colors_rgba[4*i]=u[nx*ny-i];
+      colors_rgba[4*i+1]=u[nx*ny-i];
+      colors_rgba[4*i+2]=u[nx*ny-i];
+      colors_rgba[4*i+3]=1.0f;
+    }
 
 
+    glActiveTexture( GL_TEXTURE0 );
+    glBindTexture( GL_TEXTURE_2D, tex_output );
+    glTexImage2D( GL_TEXTURE_2D, 0, GL_RGBA32F, tex_w, tex_h, 0, GL_RGBA, GL_FLOAT, &colors_rgba[0] );
+    glBindImageTexture( 0, tex_output, 0, GL_FALSE, 0, GL_WRITE_ONLY, GL_RGBA32F );
 
-  	// Draw elements
-    glUseProgram(shaderProgram);
-  	glDrawElements(GL_LINES_ADJACENCY, 4*(nx-1)*(nx-1), GL_UNSIGNED_INT, 0);
+    {                                          // launch compute shaders!
+      glUseProgram( ray_program );
+      glDispatchCompute( (GLuint)tex_w, (GLuint)tex_h, 1 );
+    }
 
-  	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
-  			glfwSetWindowShouldClose(window, GL_TRUE);
+    {                                          // launch compute shaders!
+      glUseProgram( ray_program2 );
+      glDispatchCompute( (GLuint)tex_w, (GLuint)tex_h, 1 );
+    }
 
-    // counter_file ++;
-    // if(counter_file == 110){
-    //   for(int j=0; j<ny; j++){
-    // 		for(int i=0; i<nx; i++){
-    // 			fprintf(fpt, "%f ", u[nx*j + i]);
-    // 		}
-    // 		fprintf(fpt, "\n");
-    // 	}
-    //   exit(0);
-    // }
-    // if(counter_file == 50){
-    //   for(int j=0; j<ny; j++){
-    // 		for(int i=0; i<nx; i++){
-    // 			fprintf(fpt2, "%f ", u[nx*j + i]);
-    // 		}
-    // 		fprintf(fpt2, "\n");
-    // 	}
-    //   exit(0);
-    // }
 
+    // prevent sampling befor all writes to image are done
+    glMemoryBarrier( GL_SHADER_IMAGE_ACCESS_BARRIER_BIT );
+
+    glClear( GL_COLOR_BUFFER_BIT );
+    glUseProgram( quad_program );
+    glBindVertexArray( quad_vao );
+    glActiveTexture( GL_TEXTURE0 );
+    glBindTexture( GL_TEXTURE_2D, tex_output2 );
+    glDrawArrays( GL_TRIANGLE_STRIP, 0, 4 );
+
+    glfwPollEvents();
+    if ( GLFW_PRESS == glfwGetKey( window, GLFW_KEY_ESCAPE ) ) { glfwSetWindowShouldClose( window, 1 ); }
+    glfwSwapBuffers( window );
   }
 
-  // gettimeofday(&end, NULL);
-  //
-  // double delta = ((end.tv_sec  - start.tv_sec) * 1000000u +
-  //        end.tv_usec - start.tv_usec) / 1.e6;
-  // printf("Time taken: %f \n", delta);
+  stop_gl(); // stop glfw, close window
 
-
-	//free memory
-	free(u);
-
+  free(u);
 	cudaFree(u_gpu);
 
 	printf("\n *Happy computer sound* \n");
-
-	return 0;
-}
-
-
-int parity(int di, int dj, int i, int j, int rho){
-	return ((dj+1)*i + (di+1)*j + rho) % 4;
+  return 0;
 }

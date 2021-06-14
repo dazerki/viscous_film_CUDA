@@ -3,6 +3,7 @@
 
 # compile C with /usr/bin/cc
 # compile CUDA with /usr/local/cuda/bin/nvcc
+# compile CXX with /usr/bin/c++
 C_DEFINES = 
 
 C_INCLUDES = -I/usr/include/python3.8 -I/home/antoine/Documents/Viscous/GPU/src -I/home/antoine/Documents/Viscous/GPU/inc
@@ -13,5 +14,11 @@ CUDA_DEFINES =
 
 CUDA_INCLUDES = -I/usr/include/python3.8 -I/home/antoine/Documents/Viscous/GPU/src -I/home/antoine/Documents/Viscous/GPU/inc
 
-CUDA_FLAGS =  --generate-code=arch=compute_70,code=[sm_70] --generate-code=arch=compute_72,code=[compute_72]
+CUDA_FLAGS =  --generate-code=arch=compute_70,code=[sm_70] --generate-code=arch=compute_72,code=[compute_72] -std=c++14
+
+CXX_DEFINES = 
+
+CXX_INCLUDES = -I/usr/include/python3.8 -I/home/antoine/Documents/Viscous/GPU/src -I/home/antoine/Documents/Viscous/GPU/inc
+
+CXX_FLAGS = 
 

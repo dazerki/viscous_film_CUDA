@@ -1,4 +1,14 @@
 #include "shaders.h"
+#include <stdio.h>
+#include <stdlib.h>
+
+void checkGLError()
+{
+    GLenum err;
+    while((err = glGetError()) != GL_NO_ERROR){
+        printf("%d \n", err);
+    }
+}
 
 
 void init_shaders() {
@@ -8,12 +18,10 @@ void init_shaders() {
 
         in vec2 position;
         in float color;
-        out VS_OUT {
-            float color;
-        } vs_out;
+        out float color_vert;
 
         void main() {
-            vs_out.color = color;
+            color_vert = color;
             gl_Position = vec4(position, 0.0, 1.0);
         }
     )glsl";
@@ -25,17 +33,13 @@ void init_shaders() {
         layout (lines_adjacency) in;
         layout (triangle_strip, max_vertices = 4) out;
 
-        in VS_OUT {
-            float color;
-        } gs_in[];
-        out GS_OUT {
-            float color;
-        } gs_out;
+        in float color_vert;
+        out float color_geo;
 
         void main() {
             for (int i = 0; i < 4; i++) {
                 gl_Position = gl_in[i].gl_Position;
-                gs_out.color = gs_in[i].color;
+                color_geo = color_vert;
                 EmitVertex();
             }
 
@@ -47,10 +51,8 @@ void init_shaders() {
     fragmentSource = R"glsl(
         #version 450 core
 
-        in GS_OUT {
-            float color;
-        } fs_in;
-        out vec4 color;
+        in float color_geo;
+        out vec4 color_out;
 
         vec4 turbo(float x) {
             const vec4 kRedVec4 = vec4(0.13572138, 4.61539260, -42.66032258, 132.13108234);
@@ -72,7 +74,7 @@ void init_shaders() {
         }
 
         void main() {
-            color = vec4(fs_in.color, fs_in.color, fs_in.color, 1.0);
+            color_out = vec4(color_geo, color_geo, color_geo, 1.0);
         }
     )glsl";
 
@@ -170,6 +172,26 @@ void init_shaders() {
 
     )glsl";
 
+
+    testSource = R"glsl(
+          #version 450 core
+          layout(local_size_x = 1, local_size_y = 1) in;
+          layout(rgba32f, binding = 0) uniform image2D img_output;
+          void main() {
+            // base pixel colour for image
+                vec4 pixel = vec4(1., 1., 1., 1.);
+                // get index in global work group i.e x,y position
+                ivec2 pixel_coords = ivec2(gl_GlobalInvocationID.xy);
+
+                //
+                // interesting stuff happens here later
+                //
+
+                // output to a specific pixel in the image
+                imageStore(img_output, pixel_coords, pixel);
+          }
+
+    )glsl";
     //caustic shaders
     causticSource = R"glsl(
           #version 300 es
@@ -297,23 +319,37 @@ void init_shaders() {
     glLinkProgram(shaderProgram);
 
 
-    // Create and compile the caustic shader
-    causticShader = glCreateShader(GL_COMPUTE_SHADER);
-    glShaderSource(causticShader, 1, &causticSource, NULL);
-    glCompileShader(causticShader);
 
-    causticProgram = glCreateProgram();
-    glAttachShader(causticProgram, causticShader);
-    glLinkProgram(causticProgram);
+    // Create and compile the caustic shader
+    // causticShader = glCreateShader(GL_COMPUTE_SHADER);
+    // glShaderSource(causticShader, 1, &causticSource, NULL);
+    // glCompileShader(causticShader);
+    //
+    // causticProgram = glCreateProgram();
+    // glAttachShader(causticProgram, causticShader);
+    // glLinkProgram(causticProgram);
 
     // Create and compile the refraction shader
-    refractionShader = glCreateShader(GL_COMPUTE_SHADER);
-    glShaderSource(refractionShader, 1, &refractionSource, NULL);
-    glCompileShader(refractionShader);
+    // refractionShader = glCreateShader(GL_COMPUTE_SHADER);
+    // glShaderSource(refractionShader, 1, &refractionSource, NULL);
+    // glCompileShader(refractionShader);
+    //
+    // refractionProgram = glCreateProgram();
+    // glAttachShader(refractionProgram, refractionShader);
+    // glLinkProgram(refractionProgram);
 
-    refractionProgram = glCreateProgram();
-    glAttachShader(refractionProgram, refractionShader);
-    glLinkProgram(refractionProgram);
+    testShader = glCreateShader(GL_COMPUTE_SHADER);
+    glShaderSource(testShader, 1, &testSource, NULL);
+    glCompileShader(testShader);
+
+    testProgram = glCreateProgram();
+    glAttachShader(testProgram, testShader);
+    glLinkProgram(testProgram);
+
+
+
+    checkGLError();
+    printf("HERE init \n");
 
 }
 

@@ -2,11 +2,11 @@
 cmake_minimum_required(VERSION 3.12.2)
 
 # Project name
-project(Project LANGUAGES C CUDA)
+project(Project LANGUAGES C CXX CUDA)
 # Exec name
 set(EXEC_NAME project)
 set(CMAKE_C_FLAGS "-O3")
-# set(CMAKE_CUDA_FLAGS "-lineinfo")
+
 
 # CMake module
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/")
@@ -37,11 +37,14 @@ include_directories(${PROJECT_SOURCE_DIR}/src ${PROJECT_SOURCE_DIR}/inc)
 file(GLOB C_SRCS
     "${PROJECT_SOURCE_DIR}/src/*.c"
 )
+file(GLOB CXX_SRCS
+    "${PROJECT_SOURCE_DIR}/src/*.cpp"
+)
 file(GLOB CUDA_SRCS
     "${PROJECT_SOURCE_DIR}/src/*.cu"
 )
 # Use Gcc for compiling/linking the source files
-add_executable(${EXEC_NAME} ${C_SRCS} ${CUDA_SRCS})
+add_executable(${EXEC_NAME} ${C_SRCS} ${CXX_SRCS} ${CUDA_SRCS})
 target_link_libraries(${EXEC_NAME} ${PYTHON_LIBRARIES} ${OPENMP_C_LIBRARIES} ${GLEW_LIBRARIES} ${GLFW3_LIBRARY} ${OPENGL_LIBRARY} pthread m)
 set_property(TARGET ${EXEC_NAME} PROPERTY CUDA_ARCHITECTURES 70-real 72-virtual)
 # set_property(TARGET ${EXEC_NAME} PROPERTY CUDA_FLAG lineinfo)

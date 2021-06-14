@@ -8,11 +8,10 @@ set(CMAKE_DEPENDS_LANGUAGES
 
 # The set of dependency files which are needed:
 set(CMAKE_DEPENDS_DEPENDENCY_FILES
-  "/home/antoine/Documents/Viscous/GPU/src/shaders.c" "CMakeFiles/project.dir/src/shaders.c.o" "gcc" "CMakeFiles/project.dir/src/shaders.c.o.d"
   "/home/antoine/Documents/Viscous/GPU/src/viscous.c" "CMakeFiles/project.dir/src/viscous.c.o" "gcc" "CMakeFiles/project.dir/src/viscous.c.o.d"
-  "/home/antoine/Documents/Viscous/GPU/src/window.c" "CMakeFiles/project.dir/src/window.c.o" "gcc" "CMakeFiles/project.dir/src/window.c.o.d"
   "/home/antoine/Documents/Viscous/GPU/src/kernel.cu" "CMakeFiles/project.dir/src/kernel.cu.o" "gcc" "CMakeFiles/project.dir/src/kernel.cu.o.d"
   "/home/antoine/Documents/Viscous/GPU/src/project.cu" "CMakeFiles/project.dir/src/project.cu.o" "gcc" "CMakeFiles/project.dir/src/project.cu.o.d"
+  "/home/antoine/Documents/Viscous/GPU/src/gl_utils.cpp" "CMakeFiles/project.dir/src/gl_utils.cpp.o" "gcc" "CMakeFiles/project.dir/src/gl_utils.cpp.o.d"
   )
 
 # Targets to which this target links.

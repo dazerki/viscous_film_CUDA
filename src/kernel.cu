@@ -1,6 +1,7 @@
 #include <cuda.h>
 #include <stdio.h>
 
+
 #include "kernel.h"
 
 __global__ void flux_x(float *u, int rho)
@@ -128,7 +129,6 @@ __global__ void flux_y(float *u, int rho)
 
 	int i = (int) k % nx;
 	int j = (int) k / nx;
-
 
 	rho_ij = ((dj+1)*i + (di+1)*j + rho) % 4;
 	if (rho_ij == 3){
