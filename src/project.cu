@@ -24,6 +24,10 @@ extern "C" {
 
 #include "gl_utils.h"
 
+bool start_gl();
+void mouse_button_callback(GLFWwindow* window, int button, int action, int mods);
+GLboolean drag;
+
 // this is the compute shader in an ugly C string
 const char* compute_shader_str_caustic =
   "#version 430\n                                                             \
@@ -39,7 +43,7 @@ layout (rgba32f, binding = 5) uniform image2D caustic4_in;\n                  \
 \n                                                                            \
 const vec3 L = vec3(0.09901475,  0.09901475, -0.99014754); \n                 \
 \n                                                                            \
-const float hRest = .1; \n                                                    \
+const float hRest = .2*0.01; \n                                                    \
 \n                                                                            \
 const float nAir = 1.000277; \n                                               \
 const float nWater = 1.330; \n                                                \
@@ -145,7 +149,7 @@ vec2 getGroundIntersection(vec2 fluidIncidentPoint){ \n                       \
   \n                                                                          \
   vec3 Ltag = refRatio * L + (cosTheta1 * refRatio - cosTheta2) * n; \n       \
 \n                                                                            \
-  float alpha = imageLoad(data_in, ij).a / Ltag.z;\n                                           \
+  float alpha = 0.01*imageLoad(data_in, ij).a / Ltag.z;\n                                           \
 \n                                                                            \
   return p + alpha * Ltag.xy; \n                                              \
 }\n                                                                           \
@@ -391,12 +395,12 @@ int main() {
   			flux_y<<<Nblocks, Nthreads>>>(u_gpu, rho);
   		}
 
-      // glfwPollEvents();
-  		// if(drag){
-      //   cudaMemcpy( u, u_gpu, size*sizeof(float), cudaMemcpyDeviceToHost );
-  		// 	add_fluid(window);
-      //   cudaMemcpy( u_gpu, u, memSize, cudaMemcpyHostToDevice );
-  		// }
+      glfwPollEvents();
+  		if(drag){
+        cudaMemcpy( u, u_gpu, size*sizeof(float), cudaMemcpyDeviceToHost );
+  			add_fluid(window, u);
+        cudaMemcpy( u_gpu, u, memSize, cudaMemcpyHostToDevice );
+  		}
   	}
     normal<<<Nblocks, Nthreads>>>(u_gpu, normals_gpu, nx);
 
@@ -450,4 +454,42 @@ int main() {
 
 	printf("\n *Happy computer sound* \n");
   return 0;
+}
+
+bool start_gl() {
+  { // glfw
+    if ( !glfwInit() ) {
+      fprintf( stderr, "ERROR: could not start GLFW3\n" );
+      return false;
+    }
+    glfwWindowHint( GLFW_CONTEXT_VERSION_MAJOR, 4 );
+    glfwWindowHint( GLFW_CONTEXT_VERSION_MINOR, 3 ); // compute shaders added in 4.3
+    glfwWindowHint( GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE );
+    glfwWindowHint( GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE );
+    window = glfwCreateWindow( WINDOW_W, WINDOW_H, "compute shaders tutorial", NULL, NULL );
+    if ( !window ) {
+      fprintf( stderr, "ERROR: could not open window with GLFW3\n" );
+      glfwTerminate();
+      return false;
+    }
+    glfwMakeContextCurrent( window );
+    glfwSetMouseButtonCallback(window, mouse_button_callback);
+  }
+  { // glew
+    glewExperimental = GL_TRUE;
+    glewInit();
+  }
+  const GLubyte* renderer = glGetString( GL_RENDERER );
+  const GLubyte* version  = glGetString( GL_VERSION );
+  printf( "Renderer: %s\n", renderer );
+  printf( "OpenGL version %s\n", version );
+  return true;
+}
+
+void mouse_button_callback(GLFWwindow* window, int button, int action, int mods)
+{
+		if(button == GLFW_MOUSE_BUTTON_LEFT) {
+			drag = (action == GLFW_PRESS);
+		}
+
 }

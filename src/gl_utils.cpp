@@ -4,37 +4,11 @@
 // 26 Feb 2016
 
 #include "gl_utils.h"
+#include <math.h>
 
 GLFWwindow* window;
 
-bool start_gl() {
-  { // glfw
-    if ( !glfwInit() ) {
-      fprintf( stderr, "ERROR: could not start GLFW3\n" );
-      return false;
-    }
-    glfwWindowHint( GLFW_CONTEXT_VERSION_MAJOR, 4 );
-    glfwWindowHint( GLFW_CONTEXT_VERSION_MINOR, 3 ); // compute shaders added in 4.3
-    glfwWindowHint( GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE );
-    glfwWindowHint( GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE );
-    window = glfwCreateWindow( WINDOW_W, WINDOW_H, "compute shaders tutorial", NULL, NULL );
-    if ( !window ) {
-      fprintf( stderr, "ERROR: could not open window with GLFW3\n" );
-      glfwTerminate();
-      return false;
-    }
-    glfwMakeContextCurrent( window );
-  }
-  { // glew
-    glewExperimental = GL_TRUE;
-    glewInit();
-  }
-  const GLubyte* renderer = glGetString( GL_RENDERER );
-  const GLubyte* version  = glGetString( GL_VERSION );
-  printf( "Renderer: %s\n", renderer );
-  printf( "OpenGL version %s\n", version );
-  return true;
-}
+
 
 void stop_gl() { glfwTerminate(); }
 
@@ -131,4 +105,18 @@ GLuint create_quad_program() {
   glLinkProgram( program );
   check_program_errors( program ); // code moved to gl_utils.cpp
   return program;
+}
+
+void add_fluid(GLFWwindow* window, float* u){
+	double xpos, ypos;
+	glfwGetCursorPos(window, &xpos, &ypos);
+	int i = 512-floor(512*xpos/800);
+	int j = floor(512*ypos/800);
+	for(int k=-20; k<20; k++){
+		for(int p=-20; p<20 ; p++){
+			if((k*k)+(p*p)<400){
+				u[512*(j+p)+(i+k)] = u[512*(j+p)+(i+k)] + 0.002f;
+			}
+		}
+	}
 }
