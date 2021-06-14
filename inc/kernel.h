@@ -5,4 +5,6 @@ __global__ void flux_x(float *u, int rho);
 
 __global__ void flux_y(float *u, int rho);
 
+__global__ void normal(float *u, float *normals, int nx);
+
 #endif

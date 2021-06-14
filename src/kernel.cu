@@ -28,10 +28,10 @@ __global__ void flux_x(float *u, int rho)
 		float u_p, u_q;
 	  float h = 1.0f/nx;
 
-	  float tau = 0.001f ;
+	  float tau = 0.0002f ;
 		float e = 0.01f;
 		float eta = 0.00f;
-		float G = 13.0f;
+		float G = 5.0f;
 		if (i==0){
 			i_p = nx - 1;
 			j_p = j - dj;
@@ -139,10 +139,10 @@ __global__ void flux_y(float *u, int rho)
 		float u_p, u_q;
 	  float h = 1.0f/nx;
 
-	  float tau = 0.001f ;
+	  float tau = 0.0002f ;
 		float e = 0.01f;
 		float eta = 0.00f;
-		float G = 13.0f;
+		float G = 5.0f;
 
 		if (j==0){
 			i_p = i - di;
@@ -225,4 +225,20 @@ __global__ void flux_y(float *u, int rho)
 			u[nx*j_p + i_p] -= delta_u;
 		}
   }
+}
+
+__global__ void normal(float *u, float *normals, int nx){
+	int k = blockIdx.x * blockDim.x + threadIdx.x;
+	int i = (int) k % nx;
+	int j = (int) k / nx;
+	float dx = 1.0f/nx;
+
+	float u_x = (u[nx*j+i+1]-u[nx*j+i-1])/(2.0f*dx);
+	float u_y = (u[nx*(j+1)+i]-u[nx*(j-1)+i])/(2.0f*dx);
+	float coeff = 1.0f/sqrt(1.0f+ u_x + u_y);
+
+	normals[3*k] = -u_x*coeff;
+	normals[3*k+1] = -u_y*coeff;
+	normals[3*k+2] = coeff;
+
 }
