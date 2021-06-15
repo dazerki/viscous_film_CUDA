@@ -17,6 +17,9 @@ extern "C" {
 #include <sys/time.h>
 #include <cuda.h>
 
+#define STB_IMAGE_IMPLEMENTATION
+#include "stb_image.h"
+
 // compute shaders tutorial
 // Dr Anton Gerdelan <gerdela@scss.tcd.ie>
 // Trinity College Dublin, Ireland
@@ -41,12 +44,12 @@ layout (rgba32f, binding = 5) uniform image2D caustic4_in;\n                  \
 #define N 13 \n                                                               \
 #define N_HALF 6 \n                                                           \
 \n                                                                            \
-const vec3 L = vec3(0.09901475,  0.09901475, -0.99014754); \n                 \
+const vec3 L = vec3(0.,  0., 1.); \n                 \
 \n                                                                            \
-const float hRest = .2*0.01; \n                                                    \
+const float hRest = .04; \n                                                    \
 \n                                                                            \
 const float nAir = 1.000277; \n                                               \
-const float nWater = 1.330; \n                                                \
+const float nWater = 1.54; \n                                                \
 \n                                                                            \
 vec3 getRefractedLightDirection(vec3 n, vec3 L) \n                            \
 { \n                                                                          \
@@ -124,13 +127,13 @@ layout (rgba32f, binding = 4) uniform image2D caustic3_in;\n                  \
 layout (rgba32f, binding = 5) uniform image2D caustic4_in;\n                  \
 layout (rgba32f, binding = 6) uniform image2D ground_in;\n                    \
 \n                                                                            \
-const vec3 L = vec3(0.09901475,  0.09901475, -0.99014754);\n                  \
+const vec3 L = vec3(0.,  0., 1.);\n                  \
 \n                                                                            \
 const float nAir = 1.000277; \n                                               \
 \n                                                                            \
 const float fluidRefractiveIndex = 1.54;\n                                          \
 const vec3 fluidColor = vec3(0.3, 0.15, 0.); \n                                                     \
-const vec2 fluidClarity = vec2(0.1, 0.5); \n                                                   \
+const vec2 fluidClarity = vec2(0.04, 0.5); \n                                                   \
 \n                                                                            \
 vec2 getGroundIntersection(vec2 fluidIncidentPoint){ \n                       \
   vec2 p = fluidIncidentPoint; \n                                             \
@@ -149,7 +152,7 @@ vec2 getGroundIntersection(vec2 fluidIncidentPoint){ \n                       \
   \n                                                                          \
   vec3 Ltag = refRatio * L + (cosTheta1 * refRatio - cosTheta2) * n; \n       \
 \n                                                                            \
-  float alpha = 0.01*imageLoad(data_in, ij).a / Ltag.z;\n                                           \
+  float alpha = imageLoad(data_in, ij).a / Ltag.z;\n                                           \
 \n                                                                            \
   return p + alpha * Ltag.xy; \n                                              \
 }\n                                                                           \
@@ -175,11 +178,11 @@ void main(){ \n                                                               \
   illumination += imageLoad(caustic3_in, p + ivec2(0, 4)).b;  \n               \
   illumination += imageLoad(caustic3_in, p + ivec2(0, 5)).a;  \n               \
   illumination += imageLoad(caustic4_in, p + ivec2(0, 6)).r;  \n               \
-  illumination = max(illumination - .8, 0.); \n                               \
-  vec3 groundColor = vec3(1., 1., 1.); \n                          \
+  illumination = max(illumination -0.2, 0.); \n                               \
+  vec3 groundColor = imageLoad(ground_in, p).rgb; \n                          \
   float height = imageLoad(data_in, ij).a; \n                                 \
   float depth = max(0., min((height - fluidClarity.x) / (fluidClarity.y - fluidClarity.x), 1.)); \n                         \
-  imageStore(img_output, ij, vec4(((1. - depth) * groundColor + depth * fluidColor) + illumination * fluidColor, 1.)); \n   \
+  imageStore(img_output, ij, vec4(((1. - depth) * groundColor + depth * fluidColor + illumination * fluidColor) , 1.)); \n   \
   if (imageLoad(data_in, ij).a == 0.) { \n                                    \
       imageStore(img_output, ij, vec4(0., 0., 0., 1.)); \n                    \
   } \n                                                                        \
@@ -321,7 +324,20 @@ int main() {
     glBindImageTexture( 5, tex_caustic4, 0, GL_FALSE, 0, GL_WRITE_ONLY, GL_RGBA32F );
   }
 
+
   // texture handle and dimensions
+  int widthG, heightG, nrChannelsG;
+  unsigned char *ground_image = stbi_load("../ground_image.png", &widthG, &heightG, &nrChannelsG, 0);
+  float* ground_data = (float*)calloc(4*heightG*widthG, sizeof(float));
+  printf("data = %d, %d \n",heightG, widthG);
+  for(int i = 0; i<widthG; i++){
+    for(int j =0; j< heightG; j++){
+      ground_data[4*(i*widthG+j)] =(float) ground_image[4*(i*widthG+j)]/255.0;
+      ground_data[4*(i*widthG+j)+1] =(float) ground_image[4*(i*widthG+j)+1]/255.0;
+      ground_data[4*(i*widthG+j)+2] =(float) ground_image[4*(i*widthG+j)+2]/255.0;
+      ground_data[4*(i*widthG+j)+3] =(float) ground_image[4*(i*widthG+j)+3]/255.0;
+    }
+  }
   GLuint tex_ground = 0;
   { // create the texture
     glGenTextures( 1, &tex_ground );
@@ -333,10 +349,11 @@ int main() {
     glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
     glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
     // same internal format as compute shader input
-    glTexImage2D( GL_TEXTURE_2D, 0, GL_RGBA32F, tex_w, tex_h, 0, GL_RGBA, GL_FLOAT, NULL );
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA32F, widthG, heightG, 0, GL_RGBA, GL_FLOAT, &ground_data[0]);
     // bind to image unit so can write to specific pixels from the shader
     glBindImageTexture( 6, tex_ground, 0, GL_FALSE, 0, GL_WRITE_ONLY, GL_RGBA32F );
   }
+
 
 
   { // query up the workgroups
@@ -368,6 +385,9 @@ int main() {
 	float *u_gpu;
   float *normals_gpu;
 
+  int width, height, nrChannels;
+  unsigned char *data_image = stbi_load("../test_image.png", &width, &height, &nrChannels, 0);
+
   size_t memSize = size*sizeof(float);
 
 	cudaMalloc( (void**)&u_gpu, memSize );
@@ -376,14 +396,19 @@ int main() {
 	//init
 	initialization(u, nx, ny, h, 3);
 
-
-	cudaMemcpy( u_gpu, u, memSize, cudaMemcpyHostToDevice );
-  cudaMemcpy( normals_gpu, normals, 3*memSize, cudaMemcpyHostToDevice );
-
   int Nblocks = (nx*nx + 255)/256;
   int Nthreads = 256;
 
 	int n_passe = 10;
+  for(int i = 0; i<width; i++){
+    for(int j = 0; j<height; j++){
+      if(data_image[4*(j*width+i)] == 0){
+        u[(j*nx+(nx-i))] = 0.0f;
+      }
+    }
+  }
+  cudaMemcpy( u_gpu, u, memSize, cudaMemcpyHostToDevice );
+  cudaMemcpy( normals_gpu, normals, 3*memSize, cudaMemcpyHostToDevice );
 
   while ( !glfwWindowShouldClose( window ) ) { // drawing loop
     for(int p=0; p<n_passe; p++){
