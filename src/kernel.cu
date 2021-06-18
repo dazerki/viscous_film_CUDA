@@ -103,8 +103,8 @@ __global__ void flux_x(float *u, int rho)
 		}
 
 		if(i == 0){
-			u[nx*(j+nx)%nx + (i+nx)%nx] += delta_u;
-			u[nx*(j_p+nx)%nx + (i_p+nx)%nx] -= delta_u;
+			u[nx*((j+nx)%nx) + (i+nx)%nx] += delta_u;
+			u[nx*((j_p+nx)%nx) + (i_p+nx)%nx] -= delta_u;
 		} else {
 			u[nx*j + i] += delta_u;
 			u[nx*j_p + i_p] -= delta_u;

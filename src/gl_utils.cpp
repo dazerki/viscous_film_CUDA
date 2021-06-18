@@ -120,3 +120,17 @@ void add_fluid(GLFWwindow* window, float* u){
 		}
 	}
 }
+
+void remove_fluid(GLFWwindow* window, float* u){
+	double xpos, ypos;
+	glfwGetCursorPos(window, &xpos, &ypos);
+	int i = 512-floor(512*xpos/800);
+	int j = floor(512*ypos/800);
+	for(int k=-11; k<11; k++){
+		for(int p=-11; p<11 ; p++){
+			if((k*k)+(p*p)<121){
+				u[512*(j+p)+(i+k)] = 0.0f;
+			}
+		}
+	}
+}

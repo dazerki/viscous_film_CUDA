@@ -27,6 +27,10 @@ void initialization(float* u, int nx, int ny,  float h, int choice){
   else if(choice == 4) {
     merging_gaussian(u, nx, ny, h);
   }
+  else if (choice == 5){
+    // big_line(u, nx, ny, 0.4f);
+    dashed_line(u, nx, ny, 0.0f);
+  }
 
 }
 
@@ -109,9 +113,17 @@ void simple_gaussian(float* u, int nx, int ny, float h){
 }
 
 void big_line(float* u, int nx, int ny, float value){
-  for(int index=350*nx ; index<390*nx ; index++){
+  for(int index=30*nx ; index<60*nx ; index++){
 		u[index] = value;
 	}
+}
+
+void dashed_line(float* u, int nx, int ny, float value){
+  for(int index = 62*nx; index < 82*nx; index++){
+    if((((index%nx)/15))%2 == 0){
+      u[index] = value;
+    }
+  }
 }
 
 void merging_gaussian(float* u, int nx, int ny, float h){

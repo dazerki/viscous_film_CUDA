@@ -30,6 +30,7 @@ extern "C" {
 bool start_gl();
 void mouse_button_callback(GLFWwindow* window, int button, int action, int mods);
 GLboolean drag;
+GLboolean drag_neg;
 
 // this is the compute shader in an ugly C string
 const char* compute_shader_str_caustic =
@@ -44,12 +45,12 @@ layout (rgba32f, binding = 5) uniform image2D caustic4_in;\n                  \
 #define N 13 \n                                                               \
 #define N_HALF 6 \n                                                           \
 \n                                                                            \
-const vec3 L = vec3(0.,  0., 1.); \n                 \
+const vec3 L = vec3(0.,  0., -1.); \n                 \
 \n                                                                            \
 const float hRest = .04; \n                                                    \
 \n                                                                            \
 const float nAir = 1.000277; \n                                               \
-const float nWater = 1.54; \n                                                \
+const float nWater = 1.504; \n                                          \
 \n                                                                            \
 vec3 getRefractedLightDirection(vec3 n, vec3 L) \n                            \
 { \n                                                                          \
@@ -127,13 +128,13 @@ layout (rgba32f, binding = 4) uniform image2D caustic3_in;\n                  \
 layout (rgba32f, binding = 5) uniform image2D caustic4_in;\n                  \
 layout (rgba32f, binding = 6) uniform image2D ground_in;\n                    \
 \n                                                                            \
-const vec3 L = vec3(0.,  0., 1.);\n                  \
+const vec3 L = vec3(0.,  0., -1.);\n                  \
 \n                                                                            \
 const float nAir = 1.000277; \n                                               \
 \n                                                                            \
-const float fluidRefractiveIndex = 1.54;\n                                          \
+const float fluidRefractiveIndex = 1.504;\n                                          \
 const vec3 fluidColor = vec3(0.3, 0.15, 0.); \n                                                     \
-const vec2 fluidClarity = vec2(0.04, 0.5); \n                                                   \
+const vec2 fluidClarity = vec2(0.04, 0.5 ); \n                                                   \
 \n                                                                            \
 vec2 getGroundIntersection(vec2 fluidIncidentPoint){ \n                       \
   vec2 p = fluidIncidentPoint; \n                                             \
@@ -178,7 +179,7 @@ void main(){ \n                                                               \
   illumination += imageLoad(caustic3_in, p + ivec2(0, 4)).b;  \n               \
   illumination += imageLoad(caustic3_in, p + ivec2(0, 5)).a;  \n               \
   illumination += imageLoad(caustic4_in, p + ivec2(0, 6)).r;  \n               \
-  illumination = max(illumination -0.2, 0.); \n                               \
+  illumination = max(illumination -0.8, 0.); \n                               \
   vec3 groundColor = imageLoad(ground_in, p).rgb; \n                          \
   float height = imageLoad(data_in, ij).a; \n                                 \
   float depth = max(0., min((height - fluidClarity.x) / (fluidClarity.y - fluidClarity.x), 1.)); \n                         \
@@ -329,7 +330,6 @@ int main() {
   int widthG, heightG, nrChannelsG;
   unsigned char *ground_image = stbi_load("../ground_image.png", &widthG, &heightG, &nrChannelsG, 0);
   float* ground_data = (float*)calloc(4*heightG*widthG, sizeof(float));
-  printf("data = %d, %d \n",heightG, widthG);
   for(int i = 0; i<widthG; i++){
     for(int j =0; j< heightG; j++){
       ground_data[4*(i*widthG+j)] =(float) ground_image[4*(i*widthG+j)]/255.0;
@@ -399,14 +399,14 @@ int main() {
   int Nblocks = (nx*nx + 255)/256;
   int Nthreads = 256;
 
-	int n_passe = 10;
-  for(int i = 0; i<width; i++){
-    for(int j = 0; j<height; j++){
-      if(data_image[4*(j*width+i)] == 0){
-        u[(j*nx+(nx-i))] = 0.0f;
-      }
-    }
-  }
+	int n_passe = 20;
+  // for(int i = 0; i<width; i++){
+  //   for(int j = 0; j<height; j++){
+  //     if(data_image[4*(j*width+i)] == 0){
+  //       u[(j*nx+(nx-i))] = 0.0f;
+  //     }
+  //   }
+  // }
   cudaMemcpy( u_gpu, u, memSize, cudaMemcpyHostToDevice );
   cudaMemcpy( normals_gpu, normals, 3*memSize, cudaMemcpyHostToDevice );
 
@@ -424,6 +424,11 @@ int main() {
   		if(drag){
         cudaMemcpy( u, u_gpu, size*sizeof(float), cudaMemcpyDeviceToHost );
   			add_fluid(window, u);
+        cudaMemcpy( u_gpu, u, memSize, cudaMemcpyHostToDevice );
+  		}
+      if(drag_neg){
+        cudaMemcpy( u, u_gpu, size*sizeof(float), cudaMemcpyDeviceToHost );
+  			remove_fluid(window, u);
         cudaMemcpy( u_gpu, u, memSize, cudaMemcpyHostToDevice );
   		}
   	}
@@ -516,5 +521,9 @@ void mouse_button_callback(GLFWwindow* window, int button, int action, int mods)
 		if(button == GLFW_MOUSE_BUTTON_LEFT) {
 			drag = (action == GLFW_PRESS);
 		}
+    if(button == GLFW_MOUSE_BUTTON_RIGHT) {
+			drag_neg = (action == GLFW_PRESS);
+		}
+
 
 }

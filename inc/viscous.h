@@ -31,4 +31,6 @@ void read_txt(float* height,float* height_x_edge, float* height_y_edge, char *fi
 
 void init_height_map_edge(float* data_edge_x, float* data_edge_y, float* height_x_edge, float* height_y_edge, int nx, int ny, float dx);
 
+void dashed_line(float* u, int nx, int ny, float value);
+
 #endif
