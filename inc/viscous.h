@@ -33,4 +33,5 @@ void init_height_map_edge(float* data_edge_x, float* data_edge_y, float* height_
 
 void bottom_line(float* u, int nx, int ny, float value);
 
+
 #endif

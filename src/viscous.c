@@ -6,7 +6,7 @@
 void initialization(float* u, int nx, int ny,  float h, int choice){
 
   for(int i=0; i<nx*ny; i++){
-    u[i] = 0.2f; // 0.0001
+    u[i] = 0.04f; // 0.0001
 	}
 
   // GAUSSIANS
@@ -18,6 +18,7 @@ void initialization(float* u, int nx, int ny,  float h, int choice){
   // Center circle + line
   else if(choice == 2) {
     simple_gaussian(u, nx, ny, h);
+    
     float_circle(u, nx, ny, 0.0f);
   }
 
@@ -74,7 +75,7 @@ void circle(float* u, int nx, int ny, float value){
 
 void float_circle(float* u, int nx, int ny, float value){
   for(int i=0; i<nx*ny; i++){
-    if((((i/nx - 200)*(i/nx - 200) + (i%nx -170)*(i%nx - 170) < 75*75) && i/nx < 175) || (((i/nx - 200)*(i/nx - 200) + (i%nx -342)*(i%nx - 342) < 75*75) && i/nx < 175)){
+    if((((i/nx - 250)*(i/nx - 250) + (i%nx -170)*(i%nx - 170) < 75*75) && i/nx > 275) || (((i/nx - 250)*(i/nx - 250) + (i%nx -342)*(i%nx - 342) < 75*75) && i/nx > 275)){
 			u[i] = value;
 		}
   }

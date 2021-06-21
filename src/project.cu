@@ -60,12 +60,13 @@ int main(int argc, char *argv[]){
 	cudaMalloc( (void**)&u_gpu, memSize );
 
 	//init
-	initialization(u, nx, ny, h, 3);
+	initialization(u, nx, ny, h, 2);
 
 
 	cudaMemcpy( u_gpu, u, memSize, cudaMemcpyHostToDevice );
 
   int Nblocks = (nx*nx + 255)/256;
+  
   int Nthreads = 256;
 
   // Initialise window

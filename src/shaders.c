@@ -3,6 +3,7 @@
 
 void init_shaders() {
     // Vertex shader
+    
     vertexSource = R"glsl(
         #version 450 core
 
