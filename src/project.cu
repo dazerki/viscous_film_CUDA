@@ -43,8 +43,8 @@ int main(int argc, char *argv[]){
 	float h = 1.0f/nx ;
 	int size = nx*ny;
 
-  FILE *fpt;
-	fpt = fopen("./results/video/G13_tau1e-3.txt", "w+");
+  // FILE *fpt;
+	// fpt = fopen("./results/video/G13_tau1e-3.txt", "w+");
   // FILE *fpt2;
 	// fpt2 = fopen("./results/new/delta_T_0.5.txt", "w+");
   // int counter_file = 0;
@@ -142,7 +142,7 @@ int main(int argc, char *argv[]){
 
 	// PARAMETER
 	// float tau = 0.01f ;
-	int n_passe = 20;
+	int n_passe = 10;
 
   struct timeval start, end;
 
@@ -200,12 +200,12 @@ int main(int argc, char *argv[]){
 
     // counter_file ++;
     // if(counter_file == 1750){
-      for(int j=0; j<ny; j++){
-    		for(int i=0; i<nx; i++){
-    			fprintf(fpt, "%f ", u[nx*j + i]);
-    		}
-    		fprintf(fpt, "\n");
-    	}
+      // for(int j=0; j<ny; j++){
+    	// 	for(int i=0; i<nx; i++){
+    	// 		fprintf(fpt, "%f ", u[nx*j + i]);
+    	// 	}
+    	// 	fprintf(fpt, "\n");
+    	// }
     // }
     // if(counter_file == 100000){
     //   for(int j=0; j<ny; j++){
