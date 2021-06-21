@@ -6,7 +6,7 @@
 void initialization(float* u, int nx, int ny,  float h, int choice){
 
   for(int i=0; i<nx*ny; i++){
-    u[i] = 0.0001f; // 0.0001
+    u[i] = 0.1f; // 0.0001
 	}
 
   // GAUSSIANS
@@ -23,6 +23,7 @@ void initialization(float* u, int nx, int ny,  float h, int choice){
 
   else if(choice == 3) {
     simple_gaussian(u, nx, ny, h);
+    // bottom_line(u, nx, ny, 0.0f);
   }
   else if(choice == 4) {
     merging_gaussian(u, nx, ny, h);
@@ -96,7 +97,7 @@ void simple_gaussian(float* u, int nx, int ny, float h){
 			x = i*h;
 			y = j*h;
 
-			density = (1.0f/(500.0f*2.0f*M_PI*sigma_x[l]*sigma_y[l])) * exp(-(1.0f/2.0f)*((x-mu_x[l])*(x-mu_x[l])/(sigma_x[l]*sigma_x[l]) + (y-mu_y[l])*(y-mu_y[l])/(sigma_y[l]*sigma_y[l])));
+			density = (1.0f/(80.0f*2.0f*M_PI*sigma_x[l]*sigma_y[l])) * exp(-(1.0f/2.0f)*((x-mu_x[l])*(x-mu_x[l])/(sigma_x[l]*sigma_x[l]) + (y-mu_y[l])*(y-mu_y[l])/(sigma_y[l]*sigma_y[l])));
 			if (density > u[index]){
 				u[index] = density;
 				if (density > max){
@@ -110,6 +111,12 @@ void simple_gaussian(float* u, int nx, int ny, float h){
 
 void big_line(float* u, int nx, int ny, float value){
   for(int index=350*nx ; index<390*nx ; index++){
+		u[index] = value;
+	}
+}
+
+void bottom_line(float* u, int nx, int ny, float value){
+  for(int index=510*nx ; index<512*nx ; index++){
 		u[index] = value;
 	}
 }

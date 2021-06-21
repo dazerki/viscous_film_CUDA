@@ -55,7 +55,7 @@ void add_fluid(GLFWwindow* window){
 	for(int k=-20; k<20; k++){
 		for(int p=-20; p<20 ; p++){
 			if((k*k)+(p*p)<400){
-				u[512*(j+p)+(i+k)] = u[512*(j+p)+(i+k)] + 0.002f;
+				u[512*(j+p)+(i+k)] = u[512*(j+p)+(i+k)] + 0.001f;
 			}
 		}
 	}

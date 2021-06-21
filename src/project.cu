@@ -43,11 +43,11 @@ int main(int argc, char *argv[]){
 	float h = 1.0f/nx ;
 	int size = nx*ny;
 
-  FILE *fpt;
-	fpt = fopen("./results/new/original_T_1.txt", "w+");
-  FILE *fpt2;
-	fpt2 = fopen("./results/new/original_T_3.txt", "w+");
-  int counter_file = 0;
+  // FILE *fpt;
+	// fpt = fopen("./results/new/original_T_1.txt", "w+");
+  // FILE *fpt2;
+	// fpt2 = fopen("./results/new/original_T_3.txt", "w+");
+  // int counter_file = 0;
 
 	// memory allocation
 	u = (float*)calloc(size, sizeof(float));
@@ -159,12 +159,12 @@ int main(int argc, char *argv[]){
   			flux_y<<<Nblocks, Nthreads>>>(u_gpu, rho);
   		}
 
-      // glfwPollEvents();
-  		// if(drag){
-      //   cudaMemcpy( u, u_gpu, size*sizeof(float), cudaMemcpyDeviceToHost );
-  		// 	add_fluid(window);
-      //   cudaMemcpy( u_gpu, u, memSize, cudaMemcpyHostToDevice );
-  		// }
+      glfwPollEvents();
+  		if(drag){
+        cudaMemcpy( u, u_gpu, size*sizeof(float), cudaMemcpyDeviceToHost );
+  			add_fluid(window);
+        cudaMemcpy( u_gpu, u, memSize, cudaMemcpyHostToDevice );
+  		}
   	}
     gettimeofday(&end, NULL);
 
@@ -197,24 +197,24 @@ int main(int argc, char *argv[]){
   	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
   			glfwSetWindowShouldClose(window, GL_TRUE);
 
-    counter_file ++;
-    if(counter_file == 10000){
-      for(int j=0; j<ny; j++){
-    		for(int i=0; i<nx; i++){
-    			fprintf(fpt, "%f ", u[nx*j + i]);
-    		}
-    		fprintf(fpt, "\n");
-    	}
-    }
-    if(counter_file == 30000){
-      for(int j=0; j<ny; j++){
-    		for(int i=0; i<nx; i++){
-    			fprintf(fpt2, "%f ", u[nx*j + i]);
-    		}
-    		fprintf(fpt2, "\n");
-    	}
-      exit(0);
-    }
+    // counter_file ++;
+    // if(counter_file == 10000){
+    //   for(int j=0; j<ny; j++){
+    // 		for(int i=0; i<nx; i++){
+    // 			fprintf(fpt, "%f ", u[nx*j + i]);
+    // 		}
+    // 		fprintf(fpt, "\n");
+    // 	}
+    // }
+    // if(counter_file == 30000){
+    //   for(int j=0; j<ny; j++){
+    // 		for(int i=0; i<nx; i++){
+    // 			fprintf(fpt2, "%f ", u[nx*j + i]);
+    // 		}
+    // 		fprintf(fpt2, "\n");
+    // 	}
+    //   exit(0);
+    // }
 
 
   }

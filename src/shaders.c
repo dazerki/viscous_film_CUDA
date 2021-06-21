@@ -53,6 +53,7 @@ void init_shaders() {
         out vec4 color;
 
         vec4 turbo(float x) {
+            x = (x-0.05)*4;
             const vec4 kRedVec4 = vec4(0.13572138, 4.61539260, -42.66032258, 132.13108234);
             const vec4 kGreenVec4 = vec4(0.09140261, 2.19418839, 4.84296658, -14.18503333);
             const vec4 kBlueVec4 = vec4(0.10667330, 12.64194608, -60.58204836, 110.36276771);

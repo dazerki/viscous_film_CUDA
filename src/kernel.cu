@@ -27,9 +27,9 @@ __global__ void flux_x(float *u, int rho)
 		float u_p, u_q;
 	  float h = 1.0f/nx;
 
-	  float tau = 0.0001f ;
-		float e = 20.0f;
-		float eta = 15.00f;
+	  float tau = 0.001f ;
+		float e = 5.0f;
+		float eta = 2.00f;
 		float G = 10.0f;
 		if (i==0){
 			i_p = nx - 1;
@@ -75,8 +75,8 @@ __global__ void flux_x(float *u, int rho)
 		}
 
 		if(i == 0){
-			u[nx*(j+nx)%nx + (i+nx)%nx] += delta_u;
-			u[nx*(j_p+nx)%nx + (i_p+nx)%nx] -= delta_u;
+			u[nx*((j+nx)%nx) + (i+nx)%nx] += delta_u;
+			u[nx*((j_p+nx)%nx) + (i_p+nx)%nx] -= delta_u;
 		} else {
 			u[nx*j + i] += delta_u;
 			u[nx*j_p + i_p] -= delta_u;
@@ -112,9 +112,9 @@ __global__ void flux_y(float *u, int rho)
 		float u_p, u_q;
 	  float h = 1.0f/nx;
 
-	  float tau = 0.0001f ;
-		float e = 20.0f;
-		float eta = 15.00f;
+	  float tau = 0.001f ;
+		float e = 5.0f;
+		float eta = 2.00f;
 		float G = 10.0f;
 
 		if (j==0){
