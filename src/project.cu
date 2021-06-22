@@ -50,7 +50,7 @@ const vec3 L = vec3(0.,  0., -1.); \n                 \
 const float hRest = .04; \n                                                    \
 \n                                                                            \
 const float nAir = 1.000277; \n                                               \
-const float nWater = 1.504; \n                                          \
+const float nWater = 1.33; \n                                          \
 \n                                                                            \
 vec3 getRefractedLightDirection(vec3 n, vec3 L) \n                            \
 { \n                                                                          \
@@ -132,9 +132,9 @@ const vec3 L = vec3(0.,  0., -1.);\n                  \
 \n                                                                            \
 const float nAir = 1.000277; \n                                               \
 \n                                                                            \
-const float fluidRefractiveIndex = 1.504;\n                                          \
-const vec3 fluidColor = vec3(0.3, 0.15, 0.); \n                                                     \
-const vec2 fluidClarity = vec2(0.04, 0.5 ); \n                                                   \
+const float fluidRefractiveIndex = 1.33;\n                                          \
+const vec3 fluidColor = vec3(0.4, 0., 0.05); \n                                                     \
+const vec2 fluidClarity = vec2(0.2, 0.65 ); \n                                                   \
 \n                                                                            \
 vec2 getGroundIntersection(vec2 fluidIncidentPoint){ \n                       \
   vec2 p = fluidIncidentPoint; \n                                             \
@@ -180,7 +180,7 @@ void main(){ \n                                                               \
   illumination += imageLoad(caustic3_in, p + ivec2(0, 5)).a;  \n               \
   illumination += imageLoad(caustic4_in, p + ivec2(0, 6)).r;  \n               \
   illumination = max(illumination -0.8, 0.); \n                               \
-  vec3 groundColor = imageLoad(ground_in, p).rgb; \n                          \
+  vec3 groundColor = vec3(1., 1., 1.); \n                          \
   float height = imageLoad(data_in, ij).a; \n                                 \
   float depth = max(0., min((height - fluidClarity.x) / (fluidClarity.y - fluidClarity.x), 1.)); \n                         \
   imageStore(img_output, ij, vec4(((1. - depth) * groundColor + depth * fluidColor + illumination * fluidColor) , 1.)); \n   \
@@ -328,7 +328,7 @@ int main() {
 
   // texture handle and dimensions
   int widthG, heightG, nrChannelsG;
-  unsigned char *ground_image = stbi_load("../ground_image.png", &widthG, &heightG, &nrChannelsG, 0);
+  unsigned char *ground_image = stbi_load("../vitre.png", &widthG, &heightG, &nrChannelsG, 0);
   float* ground_data = (float*)calloc(4*heightG*widthG, sizeof(float));
   for(int i = 0; i<widthG; i++){
     for(int j =0; j< heightG; j++){
@@ -386,7 +386,7 @@ int main() {
   float *normals_gpu;
 
   int width, height, nrChannels;
-  unsigned char *data_image = stbi_load("../test_image.png", &width, &height, &nrChannels, 0);
+  unsigned char *data_image = stbi_load("../title.png", &width, &height, &nrChannels, 0);
 
   size_t memSize = size*sizeof(float);
 
@@ -399,14 +399,14 @@ int main() {
   int Nblocks = (nx*nx + 255)/256;
   int Nthreads = 256;
 
-	int n_passe = 20;
-  // for(int i = 0; i<width; i++){
-  //   for(int j = 0; j<height; j++){
-  //     if(data_image[4*(j*width+i)] == 0){
-  //       u[(j*nx+(nx-i))] = 0.0f;
-  //     }
-  //   }
-  // }
+	int n_passe = 10;
+  for(int i = 0; i<width; i++){
+    for(int j = 0; j<height; j++){
+      if(data_image[4*(j*width+i)] < 200){
+        u[(j*nx+(nx-i))] = 0.0f;
+      }
+    }
+  }
   cudaMemcpy( u_gpu, u, memSize, cudaMemcpyHostToDevice );
   cudaMemcpy( normals_gpu, normals, 3*memSize, cudaMemcpyHostToDevice );
 

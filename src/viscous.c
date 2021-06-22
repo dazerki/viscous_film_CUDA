@@ -6,7 +6,7 @@
 void initialization(float* u, int nx, int ny,  float h, int choice){
 
   for(int i=0; i<nx*ny; i++){
-    u[i] = 0.04f; // 0.0001
+    u[i] = 0.2f; // 0.0001
 	}
 
   // GAUSSIANS
